@@ -2,46 +2,75 @@
    DESIGN TOKENS — toutes les valeurs de design du site.
    Pour changer une couleur, une taille ou une durée : c'est ici.
    ========================================================== */
+
+/* Polices (Indian Type Foundry, licence ITF Free Font License : usage commercial autorisé)
+   Boska : didone condensé et fin, pour les titres. Switzer : linéale suisse, pour le texte. */
+@font-face {
+  font-family: 'Boska';
+  src: url('../fonts/Boska-Variable.woff2') format('woff2');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Boska';
+  src: url('../fonts/Boska-VariableItalic.woff2') format('woff2');
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('../fonts/Switzer-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('../fonts/Switzer-VariableItalic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   /* Couleurs de la marque (plaquette commerciale) */
-  --ink: #14110f;          /* la scène : fond des pages accueil, carte, contact */
+  --ink: #14110f;          /* la scène : accueil, carte, contact */
   --ink-2: #1e1a16;
-  --ivory: #f3ede2;        /* le papier : fond des pages de lecture */
+  --ivory: #f3ede2;        /* le papier : pages de lecture */
   --ivory-2: #fbf7ef;
   --stone: #b9b0a2;        /* texte secondaire sur fond sombre */
   --stone-dark: #5b5247;   /* texte secondaire sur fond clair */
-  --gold: #c2a06b;         /* réservé au focus clavier et aux liens actifs */
+  --gold: #c2a06b;         /* réservé au focus clavier et au filet du plateau */
   --gold-deep: #7d5f31;
   --rule-dark: #3a332b;
   --rule-light: #d5cbb9;
 
-  /* Polices
-     Bodoni Moda : un didone, la famille de caractères des maisons de mode et des magazines de luxe.
-     Archivo : un grotesque à largeur variable, utilisé en largeur normale pour le texte,
-     un peu resserré pour les petites indications. */
-  --font-display: 'Bodoni Moda Variable', 'Bodoni Moda', Didot, 'Bodoni 72', serif;
-  --font-text: 'Archivo Variable', Archivo, 'Helvetica Neue', Arial, sans-serif;
-  --stretch-meta: 88%;
+  --font-display: 'Boska', 'Didot', 'Bodoni 72', serif;
+  --font-text: 'Switzer', 'Helvetica Neue', Arial, sans-serif;
 
   /* Échelle typographique : 5 tailles */
   --fs-xs: 0.8125rem;                                   /* indications, légendes */
-  --fs-s: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);     /* texte courant */
-  --fs-m: clamp(1.3rem, 1.15rem + 0.6vw, 1.75rem);      /* chapeaux, noms */
-  --fs-l: clamp(2.4rem, 1.4rem + 3.6vw, 5.25rem);       /* titres de page */
-  --fs-xl: clamp(3.4rem, 1rem + 9vw, 11rem);            /* très grands titres */
+  --fs-s: 1rem;                                         /* texte courant */
+  --fs-m: clamp(1.4rem, 1.2rem + 0.8vw, 2rem);          /* noms, sous-titres */
+  --fs-l: clamp(2.8rem, 1.4rem + 4.6vw, 6.5rem);        /* titres de page */
+  --fs-xl: clamp(3.6rem, 0.8rem + 10vw, 12.5rem);       /* très grands titres */
 
   /* Espacements */
   --space-1: 0.5rem;
   --space-2: 1rem;
   --space-3: 1.75rem;
   --space-4: 3rem;
-  --space-5: clamp(4rem, 2.5rem + 5vw, 8rem);
-  --gutter: clamp(1rem, 0.4rem + 2.6vw, 3rem);
-  --measure: 34rem; /* longueur de ligne confortable */
+  --space-5: clamp(4.5rem, 2.5rem + 6vw, 9rem);
+  --gutter: clamp(1.25rem, 0.5rem + 2.8vw, 3.25rem);
+  --measure: 32rem;
+  --header-h: 4.75rem;
 
-  /* Animations */
+  /* Mouvement */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur: 0.6s;
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --dur: 0.7s;
 }
 
 body[data-page='accueil'], body[data-page='carte'], body[data-page='contact'] {

@@ -49,7 +49,7 @@ Les éléments encore à fournir sont écrits entre crochets, par exemple `[À C
 
 ## Modifier les couleurs, polices, tailles
 
-Tout est dans **`src/styles/tokens.css`** (design tokens). Polices : Bodoni Moda (titres) et Archivo (texte), auto-hébergées.
+Tout est dans **`src/styles/tokens.css`** (design tokens). Polices : **Boska** (titres) et **Switzer** (texte), de l'Indian Type Foundry via Fontshare, sous licence ITF Free Font License (usage commercial autorisé), auto-hébergées dans `src/fonts/`.
 
 ## Organisation
 
@@ -72,5 +72,7 @@ Tout est dans **`src/styles/tokens.css`** (design tokens). Polices : Bodoni Moda
 Le site est relié à Netlify : **chaque modification envoyée sur GitHub (branche `main`) met le site en ligne à jour automatiquement**, en 1 à 2 minutes, à la même adresse.
 
 La configuration est dans `netlify.toml` (commande de construction, dossier `dist`, en-têtes).
+
+**Formulaire de contact** : il utilise Netlify Forms. Une fois le site en ligne, activez la détection des formulaires (*Project configuration → Forms → Enable form detection*), puis redéployez. Les demandes apparaissent dans l'onglet *Forms* de Netlify ; ajoutez-y une notification par e-mail vers votre adresse.
 
 ⚠️ **Avant le lancement officiel** : supprimer la ligne `X-Robots-Tag = "noindex"` dans `netlify.toml`, sinon Google n'indexera pas le site.

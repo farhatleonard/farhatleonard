@@ -4,5 +4,43 @@
   "titre": "Parlons de votre événement.",
   "intro": "Décrivez-nous votre projet. Nous revenons vers vous avec une proposition sur devis.",
   "coordonneesTitre": "Nous écrire directement",
-  "boutonEnvoyer": "Envoyer la demande"
+  "boutonEnvoyer": "Envoyer la demande",
+  "formulaire": {
+    "nom": "Nom et prénom",
+    "societe": "Société",
+    "email": "E-mail",
+    "telephone": "Téléphone",
+    "evenement": "Type d'événement",
+    "typesEvenement": [
+      "Défilé de mode",
+      "Lancement de produit",
+      "Soirée privée",
+      "Mariage",
+      "Autre"
+    ],
+    "date": "Date prévue",
+    "invites": "Nombre d'invités",
+    "fourchettesInvites": [
+      "Moins de 50",
+      "50 à 150",
+      "150 à 300",
+      "300 à 600",
+      "Plus de 600"
+    ],
+    "message": "Votre projet",
+    "facultatif": "(facultatif)",
+    "consentement": "J'accepte que ces informations soient utilisées pour répondre à ma demande.",
+    "lienConfidentialite": "Politique de confidentialité",
+    "merciTitre": "Demande envoyée.",
+    "merciTexte": "Merci. Nous revenons vers vous avec une proposition.",
+    "erreurs": {
+      "nom": "Indiquez votre nom.",
+      "email": "Indiquez une adresse e-mail valide, par exemple nom@societe.fr.",
+      "evenement": "Choisissez un type d'événement.",
+      "message": "Décrivez votre projet en quelques lignes.",
+      "consentement": "Cochez la case pour que nous puissions vous répondre.",
+      "envoi": "L'envoi n'a pas abouti. Vérifiez votre connexion et réessayez.",
+      "resume": "Certains champs sont à compléter."
+    }
+  }
 }

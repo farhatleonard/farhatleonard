@@ -1,17 +1,17 @@
-// Polices auto-hébergées (pas d'appel à Google : plus rapide et conforme RGPD).
-import '@fontsource-variable/bodoni-moda/opsz.css';
-import '@fontsource-variable/bodoni-moda/opsz-italic.css';
-import '@fontsource-variable/archivo/wdth.css';
-
 import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/pages.css';
 
+import { initLoader } from './ui/loader.js';
+import { initHeader } from './ui/header.js';
+import { initCursor } from './ui/cursor.js';
+import { initSound } from './ui/sound.js';
+import { initScroll } from './ui/scroll.js';
+import { initReveal } from './ui/reveal.js';
+
 const page = document.body.dataset.page;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 document.documentElement.classList.add('js');
-
-// Les éléments utiles seulement avec JavaScript
 document.querySelectorAll('[data-js-only]').forEach((el) => (el.hidden = false));
 
 const readDrinks = () =>
@@ -26,5 +26,14 @@ const readDrinks = () =>
     sparkling: el.dataset.sparkling === 'true',
   }));
 
-if (page === 'accueil') import('./pages/home.js').then((m) => m.init({ readDrinks, reducedMotion }));
-if (page === 'carte') import('./pages/carte.js').then((m) => m.init({ readDrinks, reducedMotion }));
+const loader = initLoader({ reducedMotion });
+const lenis = initScroll({ reducedMotion });
+initHeader({ lenis });
+initCursor({ reducedMotion });
+const sound = initSound();
+initReveal({ reducedMotion, ready: loader.done });
+
+const ctx = { readDrinks, reducedMotion, loader, sound, lenis };
+if (page === 'accueil') import('./pages/home.js').then((m) => m.init(ctx));
+if (page === 'carte') import('./pages/carte.js').then((m) => m.init(ctx));
+if (page === 'contact') import('./pages/contact.js').then((m) => m.init(ctx));

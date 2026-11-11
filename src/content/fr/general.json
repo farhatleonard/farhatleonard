@@ -6,6 +6,7 @@
     "contact": "Contact"
   },
   "son": {
+    "libelle": "Son",
     "activer": "Activer le son",
     "couper": "Couper le son"
   },

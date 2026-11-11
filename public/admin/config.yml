@@ -46,6 +46,7 @@ collections:
             widget: object
             collapsed: true
             fields:
+              - { name: libelle, label: "Texte du bouton", widget: string }
               - { name: activer, label: "Texte « activer »", widget: string }
               - { name: couper, label: "Texte « couper »", widget: string }
           - name: coordonnees
@@ -204,6 +205,38 @@ collections:
           - { name: intro, label: Introduction, widget: text }
           - { name: coordonneesTitre, label: "Titre des coordonnées", widget: string }
           - { name: boutonEnvoyer, label: "Bouton d'envoi du formulaire", widget: string }
+          - name: formulaire
+            label: Formulaire
+            widget: object
+            collapsed: true
+            fields:
+              - { name: nom, label: "Champ nom", widget: string }
+              - { name: societe, label: "Champ société", widget: string }
+              - { name: email, label: "Champ e-mail", widget: string }
+              - { name: telephone, label: "Champ téléphone", widget: string }
+              - { name: evenement, label: "Champ type d'événement", widget: string }
+              - { name: typesEvenement, label: "Types d'événement proposés", widget: list, field: { name: type, label: Type, widget: string } }
+              - { name: date, label: "Champ date", widget: string }
+              - { name: invites, label: "Champ nombre d'invités", widget: string }
+              - { name: fourchettesInvites, label: "Fourchettes d'invités proposées", widget: list, field: { name: fourchette, label: Fourchette, widget: string } }
+              - { name: message, label: "Champ message", widget: string }
+              - { name: facultatif, label: "Mention « facultatif »", widget: string }
+              - { name: consentement, label: "Texte de consentement", widget: text }
+              - { name: lienConfidentialite, label: "Lien vers la confidentialité", widget: string }
+              - { name: merciTitre, label: "Confirmation : titre", widget: string }
+              - { name: merciTexte, label: "Confirmation : texte", widget: text }
+              - name: erreurs
+                label: "Messages d'erreur"
+                widget: object
+                collapsed: true
+                fields:
+                  - { name: nom, label: Nom, widget: string }
+                  - { name: email, label: E-mail, widget: string }
+                  - { name: evenement, label: "Type d'événement", widget: string }
+                  - { name: message, label: Message, widget: string }
+                  - { name: consentement, label: Consentement, widget: string }
+                  - { name: envoi, label: "Échec d'envoi", widget: string }
+                  - { name: resume, label: "Résumé", widget: string }
 
       # ------------------------------------------------------------
       - name: legal

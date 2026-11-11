@@ -30,17 +30,24 @@ export function createRenderer({ reglages, pages: c }) {
 
   const header = (page) => `
   <a class="skip-link" href="#contenu">Aller au contenu</a>
-  <header class="site-header">
+  ${['accueil', 'carte'].includes(page) ? `<div class="loader" data-loader aria-hidden="true"><span class="loader__name">${txt(nom)}</span><span class="loader__count" data-loader-count>00</span><span class="loader__line"><i data-loader-line></i></span></div>` : ''}
+  <header class="site-header" data-header>
     <a class="site-header__brand" href="/" ${page === 'accueil' ? 'aria-current="page"' : ''}>${wordmark()}</a>
-    <nav class="site-header__nav" aria-label="Navigation principale">
+    <nav class="site-header__nav" id="menu" aria-label="Navigation principale" data-menu>
       <ul>${['carte', 'agence', 'contact']
-        .map((k) => `<li><a href="${PAGES[k]}" ${k === page ? 'aria-current="page"' : ''}>${txt(g.nav[k])}</a></li>`)
+        .map((k, i) => `<li style="--i:${i}"><a href="${PAGES[k]}" ${k === page ? 'aria-current="page"' : ''}>${txt(g.nav[k])}</a></li>`)
         .join('')}</ul>
+      <p class="site-header__menu-meta">${txt(g.coordonnees.email)}</p>
     </nav>
-    <button class="sound-toggle" type="button" aria-pressed="false" data-sound-toggle hidden>
-      <span class="sound-toggle__wave" aria-hidden="true"></span>
-      <span class="visually-hidden">${txt(g.son.activer)}</span>
-    </button>
+    <div class="site-header__tools">
+      <button class="sound-toggle" type="button" aria-pressed="false" data-sound-toggle hidden>
+        <span class="sound-toggle__bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="sound-toggle__label">${txt(g.son.libelle || 'Son')}</span>
+      </button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu" data-menu-toggle hidden>
+        <span data-menu-label>Menu</span>
+      </button>
+    </div>
   </header>`;
 
   const footer = () => `
@@ -214,6 +221,23 @@ export function createRenderer({ reglages, pages: c }) {
 
     contact: () => {
       const k = c.contact;
+      const f = k.formulaire;
+      const field = (name, label, { type = 'text', required = false, autocomplete = '', inputmode = '' } = {}) => `
+          <div class="field">
+            <input class="field__input" id="f-${name}" name="${name}" type="${type}" placeholder=" " ${required ? 'required aria-required="true"' : ''}
+              ${autocomplete ? `autocomplete="${autocomplete}"` : ''} ${inputmode ? `inputmode="${inputmode}"` : ''} aria-describedby="e-${name}">
+            <label class="field__label" for="f-${name}">${txt(label)}${required ? '' : ` <span class="field__opt">${txt(f.facultatif)}</span>`}</label>
+            <p class="field__error" id="e-${name}"></p>
+          </div>`;
+      const select = (name, label, options, required) => `
+          <div class="field field--select">
+            <select class="field__input" id="f-${name}" name="${name}" ${required ? 'required aria-required="true"' : ''} aria-describedby="e-${name}">
+              <option value="" selected></option>
+              ${options.map((o) => `<option>${txt(o)}</option>`).join('')}
+            </select>
+            <label class="field__label" for="f-${name}">${txt(label)}${required ? '' : ` <span class="field__opt">${txt(f.facultatif)}</span>`}</label>
+            <p class="field__error" id="e-${name}"></p>
+          </div>`;
       return `
     <main id="contenu" class="contact">
       <header class="page-head">
@@ -221,12 +245,48 @@ export function createRenderer({ reglages, pages: c }) {
         <p class="page-head__lead">${txt(k.intro)}</p>
       </header>
       <div class="contact__grid">
-        <p class="contact__form-placeholder">Le formulaire arrive à l'étape « Formulaire de contact ».</p>
-        <div class="contact__direct">
+        <form class="form" name="contact" method="POST" action="/contact/?envoye=1" data-netlify="true" netlify-honeypot="site-web" novalidate data-form>
+          <input type="hidden" name="form-name" value="contact">
+          <p class="form__hp" aria-hidden="true"><label>Ne pas remplir <input name="site-web" tabindex="-1" autocomplete="off"></label></p>
+          <div class="form__row">
+            ${field('nom', f.nom, { required: true, autocomplete: 'name' })}
+            ${field('societe', f.societe, { autocomplete: 'organization' })}
+          </div>
+          <div class="form__row">
+            ${field('email', f.email, { type: 'email', required: true, autocomplete: 'email' })}
+            ${field('telephone', f.telephone, { type: 'tel', autocomplete: 'tel', inputmode: 'tel' })}
+          </div>
+          <div class="form__row form__row--3">
+            ${select('evenement', f.evenement, f.typesEvenement || [], true)}
+            ${field('date', f.date, { type: 'text', autocomplete: 'off' })}
+            ${select('invites', f.invites, f.fourchettesInvites || [], false)}
+          </div>
+          <div class="field field--area">
+            <textarea class="field__input" id="f-message" name="message" rows="5" placeholder=" " required aria-required="true" aria-describedby="e-message"></textarea>
+            <label class="field__label" for="f-message">${txt(f.message)}</label>
+            <p class="field__error" id="e-message"></p>
+          </div>
+          <div class="consent">
+            <input type="checkbox" id="f-consent" name="consentement" value="oui" required aria-required="true" aria-describedby="e-consent">
+            <label for="f-consent">${txt(f.consentement)} <a href="${PAGES.legal}">${txt(f.lienConfidentialite)}</a></label>
+            <p class="field__error" id="e-consent"></p>
+          </div>
+          <div class="form__submit">
+            <button class="button" type="submit" data-submit><span>${txt(k.boutonEnvoyer)}</span></button>
+            <p class="form__status" role="status" aria-live="polite" data-status></p>
+          </div>
+          <div class="form__done" data-done hidden tabindex="-1">
+            <p class="form__done-title">${txt(f.merciTitre)}</p>
+            <p>${txt(f.merciTexte)}</p>
+          </div>
+          <template data-messages>${esc(JSON.stringify(f.erreurs || {}))}</template>
+        </form>
+        <aside class="contact__direct">
           <h2>${txt(k.coordonneesTitre)}</h2>
           <p>${txt(g.coordonnees.email)}</p>
           <p>${txt(g.coordonnees.telephone)}</p>
-        </div>
+          <p>${txt(g.coordonnees.adresse)}</p>
+        </aside>
       </div>
     </main>`;
     },

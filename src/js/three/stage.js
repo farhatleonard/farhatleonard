@@ -3,14 +3,13 @@
 // sous l'effet du mouvement, les boissons pétillantes ont des bulles, chaque verre porte sa garniture.
 // Derrière, le nom de la création, que le verre au premier plan déforme par réfraction.
 import * as THREE from 'three';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { PROFILES } from './glasses.js';
 import { createGarnish } from './garnish.js';
 
 const INK = new THREE.Color('#14110f');
 const IVORY = '#f3ede2';
-const FONT = '"Bodoni Moda Variable", "Bodoni Moda", Didot, serif';
-const SEGMENTS = 56;
+const FONT = '"Boska", Didot, serif';
+const SEGMENTS = 72;
 
 const easeOut = (t) => 1 - Math.pow(1 - t, 3);
 const mod = (a, n) => ((a % n) + n) % n;
@@ -21,6 +20,29 @@ function supportsWebGL() {
   } catch {
     return false;
   }
+}
+
+// Studio photo virtuel, utilisé uniquement pour les reflets : fond noir, deux longues boîtes à lumière
+// verticales, une lumière douce au-dessus, un liseré chaud à l'arrière. C'est ce qui dessine
+// les longs reflets nets sur le verre, comme dans une photo de produit.
+function studioEnvironment(renderer) {
+  const studio = new THREE.Scene();
+  studio.background = new THREE.Color('#050404');
+  const box = (w, h, color, intensity, pos, rotY = 0, rotX = 0) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide }));
+    m.position.set(...pos);
+    m.rotation.set(rotX, rotY, 0);
+    studio.add(m);
+  };
+  box(1.1, 7, '#ffffff', 5.5, [-4.2, 1, 2.5], Math.PI / 2.6); // boîte verticale gauche
+  box(0.8, 7, '#ffffff', 3.2, [4.4, 1, 1.8], -Math.PI / 2.4); // boîte verticale droite
+  box(6, 3, '#fff6ea', 1.3, [0, 6, 0], 0, Math.PI / 2); // lumière douce au-dessus
+  box(5, 1.2, '#ffcf96', 2.4, [0, 1.6, -6]); // liseré chaud à l'arrière
+  box(9, 0.3, '#ffffff', 0.6, [0, -0.5, 5]); // reflet bas, très discret
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const tex = pmrem.fromScene(studio, 0.015).texture;
+  pmrem.dispose();
+  return tex;
 }
 
 // Ombre douce sous chaque verre
@@ -39,7 +61,7 @@ function shadowTexture() {
   return t;
 }
 
-export async function createStage(container, { drinks, mode = 'carte', reducedMotion = false, onActive }) {
+export async function createStage(container, { drinks, mode = 'carte', reducedMotion = false, onActive, onFirstFrame }) {
   if (!supportsWebGL() || !drinks.length) return null;
 
   const n = drinks.length;
@@ -55,9 +77,8 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
   const scene = new THREE.Scene();
   scene.background = INK;
   scene.fog = new THREE.Fog(INK, 7, 14);
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
-  scene.environmentIntensity = 1.15;
+  scene.environment = studioEnvironment(renderer);
+  scene.environmentIntensity = 1;
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
 
@@ -95,7 +116,7 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
   );
   backdrop.renderOrder = -1;
   scene.add(backdrop);
-  await document.fonts.load(`400 100px ${FONT}`).catch(() => {});
+  await document.fonts.load(`300 100px ${FONT}`).catch(() => {});
 
   // ---------- Les verres ----------
   const glassMat = new THREE.MeshPhysicalMaterial({
@@ -150,9 +171,11 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     cavity.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     const liquidMat = new THREE.MeshStandardMaterial({
       vertexColors: true,
-      roughness: 0.35,
+      roughness: 0.3,
       metalness: 0,
-      envMapIntensity: 0.15,
+      envMapIntensity: 0.35,
+      emissive: top.clone().multiplyScalar(0.18), // lumière qui traverse le liquide
+
       side: THREE.DoubleSide, // la face intérieure, vue à travers la coupe, forme la surface du liquide
       clippingPlanes: [plane],
     });
@@ -220,12 +243,12 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     bg.fillStyle = glow;
     bg.fillRect(0, 0, W, H);
     if (mode !== 'carte') return; // sur l'accueil, la phrase prime : pas de nom en fond
-    let size = H * 0.26;
-    bg.font = `400 ${size}px ${FONT}`;
+    let size = H * 0.3;
+    bg.font = `300 ${size}px ${FONT}`;
     const w = bg.measureText(drinks[i].name).width;
     if (w > W * 0.92) {
       size *= (W * 0.92) / w;
-      bg.font = `400 ${size}px ${FONT}`;
+      bg.font = `300 ${size}px ${FONT}`;
     }
     bg.globalAlpha = alpha * 0.95;
     bg.fillStyle = IVORY;
@@ -259,7 +282,7 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     for (const cam of [camera, baseCamera]) {
       cam.aspect = w / h;
       cam.fov = portrait ? 38 : 30;
-      if (mode === 'home' && !portrait) cam.setViewOffset(w, h, -w * 0.27, -h * 0.04, w, h);
+      if (mode === 'home' && !portrait) cam.setViewOffset(w, h, -w * 0.31, -h * 0.03, w, h);
       else if (mode === 'home') cam.setViewOffset(w, h, 0, h * 0.2, w, h);
       else if (portrait) cam.setViewOffset(w, h, 0, h * 0.04, w, h);
       else cam.clearViewOffset();
@@ -414,6 +437,11 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     camera.lookAt(state.base.look);
 
     renderer.render(scene, camera);
+    if (onFirstFrame) {
+      const cb = onFirstFrame;
+      onFirstFrame = null;
+      requestAnimationFrame(cb);
+    }
   }
 
   const loop = () => renderer.setAnimationLoop(state.visible && !document.hidden ? frame : null);

@@ -1,7 +1,7 @@
 // La carte : la page défile normalement (pas de défilement piégé). La scène reste fixe et
 // le plateau tourne en suivant le défilement. Flèches, clavier et liste de noms
 // font défiler la page jusqu'à la création voulue.
-export async function init({ readDrinks, reducedMotion }) {
+export async function init({ readDrinks, reducedMotion, loader, sound, lenis }) {
   const main = document.querySelector('.carte');
   const container = document.querySelector('[data-stage="carte"]');
   const drinks = readDrinks();
@@ -26,7 +26,9 @@ export async function init({ readDrinks, reducedMotion }) {
     i = Math.max(0, Math.min(n - 1, i));
     const r = track.getBoundingClientRect();
     const total = r.height - innerHeight;
-    window.scrollTo({ top: scrollY + r.top + (i / (n - 1)) * total, behavior: reducedMotion ? 'auto' : 'smooth' });
+    const y = scrollY + r.top + (i / (n - 1)) * total;
+    if (lenis) lenis.scrollTo(y, { duration: 1.4 });
+    else window.scrollTo({ top: y, behavior: reducedMotion ? 'auto' : 'smooth' });
   };
 
   let current = -1;
@@ -36,6 +38,7 @@ export async function init({ readDrinks, reducedMotion }) {
     stage?.setTarget(f);
     const i = Math.round(f);
     if (i === current) return;
+    if (current !== -1) sound.play('tink');
     current = i;
     drinks.forEach((d, k) => d.el.classList.toggle('is-active', k === i));
     dots.forEach((b, k) => b.setAttribute('aria-current', k === i ? 'true' : 'false'));
@@ -53,12 +56,16 @@ export async function init({ readDrinks, reducedMotion }) {
   window.addEventListener('scroll', update, { passive: true });
   update();
 
+  loader.progress(55);
   const { createStage } = await import('../three/stage.js');
-  stage = await createStage(container, { drinks, mode: 'carte', reducedMotion });
+  loader.progress(75);
+  stage = await createStage(container, { drinks, mode: 'carte', reducedMotion, onFirstFrame: () => loader.finish() });
   if (!stage) {
     container.classList.add('stage--fallback');
+    loader.finish();
     return;
   }
   stage.setTarget(progress());
+  await loader.done;
   stage.fillIn();
 }
