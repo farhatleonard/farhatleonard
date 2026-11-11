@@ -1,27 +1,24 @@
-/* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--header-h); }
+html { -webkit-text-size-adjust: 100%; }
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--font-sans);
-  font-weight: 300;
-  font-size: var(--fs-2);
-  line-height: 1.65;
+  font-family: var(--font-text);
+  font-size: var(--fs-s);
+  font-weight: 380;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  font-kerning: normal;
 }
 img, svg, video, canvas { display: block; max-width: 100%; }
 ul, ol { list-style: none; padding: 0; }
-a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
-button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
-h1, h2, h3, h4 { font-family: var(--font-serif); font-weight: 400; line-height: 1.08; text-wrap: balance; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 400; line-height: 1.05; font-optical-sizing: auto; text-wrap: balance; }
 p { text-wrap: pretty; }
-::selection { background: var(--c-or); color: var(--c-noir); }
-
-/* Focus clavier toujours visible */
-:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+::selection { background: var(--gold); color: var(--ink); }
+:focus-visible { outline: 1px solid var(--gold); outline-offset: 5px; }
 
 .visually-hidden {
   position: absolute !important; width: 1px; height: 1px; overflow: hidden;
@@ -29,64 +26,37 @@ p { text-wrap: pretty; }
 }
 .skip-link {
   position: fixed; top: 0.75rem; left: 0.75rem; z-index: 100;
-  padding: 0.6rem 1rem; background: var(--c-or); color: var(--c-noir);
+  padding: 0.6rem 1rem; background: var(--gold); color: var(--ink);
   transform: translateY(-200%);
 }
 .skip-link:focus { transform: none; }
 
-/* Placeholders visibles : tout ce qui reste à fournir */
+/* Éléments à fournir : bien visibles, sans casser la mise en page */
 mark.todo {
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  color: inherit;
-  outline: 1px dashed color-mix(in srgb, var(--accent) 70%, transparent);
-  outline-offset: 2px;
-  padding: 0 0.15em;
-  font-style: normal;
+  background: none; color: inherit;
+  text-decoration: underline dotted color-mix(in srgb, var(--gold) 80%, transparent);
+  text-decoration-thickness: 1.5px; text-underline-offset: 0.18em;
 }
 
-/* Dans le nom (wordmark), le placeholder reste discret : simple soulignement pointillé */
-.wordmark mark.todo { background: none; outline: 0; padding: 0; text-decoration: underline dashed color-mix(in srgb, var(--accent) 60%, transparent); text-decoration-thickness: 1px; text-underline-offset: 0.12em; }
-
-/* ---------- Mise en page ---------- */
-.container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
-.container--narrow { max-width: var(--container-narrow); }
-[class*='theme-'] { background: var(--bg); color: var(--fg); }
-
-/* ---------- Typographie ---------- */
-.label {
-  font-family: var(--font-sans);
-  font-size: var(--fs-1);
-  font-weight: 400;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  line-height: 1.6;
-  color: var(--fg-2);
+/* Lien d'action : un texte souligné, qui se redessine au survol */
+.link-cta {
+  position: relative; display: inline-block; padding-block: 0.3em;
+  font-size: var(--fs-s); font-weight: 450;
 }
-.title-xl { font-size: var(--fs-5); font-weight: 300; letter-spacing: -0.01em; line-height: 1; }
-.title-l { font-size: var(--fs-4); font-weight: 300; letter-spacing: -0.005em; }
-.title-xl em, .title-l em { font-style: italic; color: var(--accent); }
-.lead { font-size: var(--fs-3); font-family: var(--font-serif); font-weight: 400; line-height: 1.4; color: var(--fg-2); max-width: 38ch; }
-
-.wordmark {
-  font-family: var(--font-serif);
-  font-weight: 300;
-  letter-spacing: var(--tracking-wordmark);
-  white-space: nowrap;
+.link-cta::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: currentColor; transform-origin: right; transition: transform var(--dur) var(--ease-out);
 }
-
-/* ---------- Boutons ---------- */
-.button {
-  display: inline-flex; align-items: center; gap: 0.75em;
-  padding: 1.05em 1.9em;
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  font-size: var(--fs-1);
-  font-weight: 400;
-  letter-spacing: calc(var(--tracking-label) * 0.5);
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--fg);
-  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+.link-cta:hover::after { transform: scaleX(0); }
+@media (hover: hover) {
+  .link-cta:hover::after { animation: redraw 0.9s var(--ease-out); }
 }
-.button:hover { background: var(--accent); color: var(--bg); }
-.button--small { padding: 0.85em 1.4em; }
+@keyframes redraw { 0% { transform: scaleX(1); transform-origin: right; } 45% { transform: scaleX(0); transform-origin: right; } 46% { transform-origin: left; } 100% { transform: scaleX(1); transform-origin: left; } }
+
+/* Transitions entre pages (navigateurs compatibles) */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.45s; animation-timing-function: var(--ease-out); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

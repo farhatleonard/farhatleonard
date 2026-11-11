@@ -1,6 +1,6 @@
 # Site vitrine — bar événementiel haut de gamme (Paris)
 
-Site statique construit avec Vite. Contenu centralisé, animations GSAP / Lenis (à partir de l'étape 3).
+Site statique construit avec Vite, Three.js (3D) et GSAP. Contenu centralisé dans un seul fichier.
 
 ## Lancer le site sur son ordinateur
 
@@ -18,11 +18,12 @@ Tout le texte du site est dans **`src/content/site.json`** :
 
 - **Nom de l'agence** : ligne `"nom"` en haut du fichier. Il est repris partout (titre de la page, en-tête, pied de page…).
 - Dans les textes, `{{NOM}}` est remplacé automatiquement par ce nom.
+- **Changer le verre d'une création** : champ `"verre"` de chaque cocktail (`coupe`, `flute`, `martini`, `tumbler`, `highball`).
 - Les éléments encore à fournir sont écrits entre crochets, par exemple `[À COMPLÉTER]`, et apparaissent encadrés en pointillés sur le site.
 
 ## Modifier les couleurs, polices, tailles
 
-Tout est dans **`src/styles/tokens.css`** (design tokens).
+Tout est dans **`src/styles/tokens.css`** (design tokens). Polices : Bodoni Moda (titres) et Archivo (texte), auto-hébergées.
 
 ## Organisation
 
@@ -31,7 +32,11 @@ Tout est dans **`src/styles/tokens.css`** (design tokens).
 | `src/content/site.json` | Tous les textes, la carte, l'équipe, les coordonnées |
 | `src/templates/render.js` | Transforme le contenu en HTML (au moment de la construction) |
 | `src/styles/` | Styles : `tokens.css` (valeurs), `base.css`, `layout.css` |
-| `src/js/main.js` | Point d'entrée JavaScript (animations à venir) |
+| `src/js/main.js` | Point d'entrée JavaScript |
+| `src/js/three/glasses.js` | Formes des verres (coupe, flûte, martini, verre bas, verre haut) |
+| `src/js/three/stage.js` | Scène 3D : le verre, le liquide, la lumière, le nom derrière le verre |
+| `src/js/pages/` | Comportement propre à chaque page (accueil, carte) |
+| `index.html`, `carte/`, `agence/`, `contact/`, `mentions-legales/` | Les pages du site |
 | `public/` | Fichiers copiés tels quels (favicon, robots.txt…) |
 
 ## Déploiement

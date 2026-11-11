@@ -4,76 +4,49 @@
    ========================================================== */
 :root {
   /* Couleurs de la marque (plaquette commerciale) */
-  --c-noir: #14110f;
-  --c-noir-doux: #1e1a16;
-  --c-papier: #f3ede2;
-  --c-papier-clair: #fbf7ef;
-  --c-or: #c2a06b;
-  --c-or-profond: #7d5f31;
-  --c-texte-2-noir: #b9b0a2;
-  --c-texte-2-papier: #5b5247;
-  --c-filet-noir: #3a332b;
-  --c-filet-papier: #d5cbb9;
+  --ink: #14110f;          /* la scène : fond des pages accueil, carte, contact */
+  --ink-2: #1e1a16;
+  --ivory: #f3ede2;        /* le papier : fond des pages de lecture */
+  --ivory-2: #fbf7ef;
+  --stone: #b9b0a2;        /* texte secondaire sur fond sombre */
+  --stone-dark: #5b5247;   /* texte secondaire sur fond clair */
+  --gold: #c2a06b;         /* réservé au focus clavier et aux liens actifs */
+  --gold-deep: #7d5f31;
+  --rule-dark: #3a332b;
+  --rule-light: #d5cbb9;
 
-  /* Polices */
-  --font-serif: 'Cormorant Garamond', 'Times New Roman', serif;
-  --font-sans: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+  /* Polices
+     Bodoni Moda : un didone, la famille de caractères des maisons de mode et des magazines de luxe.
+     Archivo : un grotesque à largeur variable, utilisé en largeur normale pour le texte,
+     un peu resserré pour les petites indications. */
+  --font-display: 'Bodoni Moda Variable', 'Bodoni Moda', Didot, 'Bodoni 72', serif;
+  --font-text: 'Archivo Variable', Archivo, 'Helvetica Neue', Arial, sans-serif;
+  --stretch-meta: 88%;
 
-  /* Échelle typographique : 5 tailles seulement */
-  --fs-1: 0.75rem;                                     /* libellés en capitales */
-  --fs-2: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);      /* texte courant */
-  --fs-3: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);     /* chapeaux, sous-titres */
-  --fs-4: clamp(2.25rem, 1.5rem + 3.2vw, 4.75rem);     /* titres de section */
-  --fs-5: clamp(3rem, 1.2rem + 7.5vw, 10rem);          /* très grands titres, wordmark */
+  /* Échelle typographique : 5 tailles */
+  --fs-xs: 0.8125rem;                                   /* indications, légendes */
+  --fs-s: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);     /* texte courant */
+  --fs-m: clamp(1.3rem, 1.15rem + 0.6vw, 1.75rem);      /* chapeaux, noms */
+  --fs-l: clamp(2.4rem, 1.4rem + 3.6vw, 5.25rem);       /* titres de page */
+  --fs-xl: clamp(3.4rem, 1rem + 9vw, 11rem);            /* très grands titres */
 
-  /* Espacement des lettres des libellés : 8 px sur grand écran, réduit sur mobile */
-  --tracking-label: clamp(3px, 0.55vw, 8px);
-  --tracking-wordmark: 0.04em;
-
-  /* Espacements (échelle) */
+  /* Espacements */
   --space-1: 0.5rem;
   --space-2: 1rem;
-  --space-3: 1.5rem;
-  --space-4: 2.5rem;
-  --space-5: 4rem;
-  --space-6: clamp(5rem, 3rem + 8vw, 11rem); /* respiration entre sections */
+  --space-3: 1.75rem;
+  --space-4: 3rem;
+  --space-5: clamp(4rem, 2.5rem + 5vw, 8rem);
+  --gutter: clamp(1rem, 0.4rem + 2.6vw, 3rem);
+  --measure: 34rem; /* longueur de ligne confortable */
 
-  /* Mise en page */
-  --container: 88rem;
-  --container-narrow: 46rem;
-  --gutter: clamp(1rem, 0.5rem + 2.5vw, 3rem);
-  --header-h: 4.5rem;
-
-  /* Animations (utilisées dès l'étape 3) */
-  --dur-fast: 0.25s;
-  --dur-base: 0.6s;
-  --dur-slow: 1.2s;
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Animations */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 0.6s;
 }
 
-/* Thèmes de section : chaque section choisit noir, papier ou or */
-.theme-dark {
-  --bg: var(--c-noir);
-  --bg-card: var(--c-noir-doux);
-  --fg: var(--c-papier);
-  --fg-2: var(--c-texte-2-noir);
-  --accent: var(--c-or);
-  --rule: var(--c-filet-noir);
+body[data-page='accueil'], body[data-page='carte'], body[data-page='contact'] {
+  --bg: var(--ink); --fg: var(--ivory); --fg-2: var(--stone); --rule: var(--rule-dark);
 }
-.theme-paper {
-  --bg: var(--c-papier);
-  --bg-card: var(--c-papier-clair);
-  --fg: var(--c-noir);
-  --fg-2: var(--c-texte-2-papier);
-  --accent: var(--c-or-profond);
-  --rule: var(--c-filet-papier);
-}
-.theme-gold {
-  --bg: var(--c-or);
-  --bg-card: #cbab78;
-  --fg: var(--c-noir);
-  --fg-2: #3a2f22;
-  --accent: var(--c-noir);
-  --rule: rgba(20, 17, 15, 0.35);
+body[data-page='agence'], body[data-page='legal'] {
+  --bg: var(--ivory); --fg: var(--ink); --fg-2: var(--stone-dark); --rule: var(--rule-light);
 }

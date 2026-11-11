@@ -6,16 +6,18 @@
     <title>%TITLE%</title>
     <meta name="description" content="%DESCRIPTION%" />
     <meta name="theme-color" content="#14110F" />
+    <meta name="view-transition" content="same-origin" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:site_name" content="%SITE_NAME%" />
     <meta property="og:title" content="%TITLE%" />
     <meta property="og:description" content="%DESCRIPTION%" />
-    <meta property="og:url" content="%URL%/" />
+    <meta property="og:url" content="%URL%" />
+    <link rel="canonical" href="%URL%" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script type="module" src="/src/js/main.js"></script>
   </head>
-  <body class="theme-dark">
+  <body data-page="accueil">
     <!--@body-->
   </body>
 </html>
