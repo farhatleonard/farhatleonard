@@ -72,17 +72,39 @@ function liquidProfile(inner, fill) {
   return pts;
 }
 
-// Profils prêts à l'emploi, centrés verticalement, tous à la même taille de tableau.
+// Profils prêts à l'emploi. Le verre est posé sur y = 0.
+// - glass : la paroi du verre (extérieur puis intérieur)
+// - cavity : l'intérieur du verre, rempli presque jusqu'au bord. Le niveau réel du liquide
+//   est donné par un plan de coupe (fillY), qui peut s'incliner quand le liquide bouge.
 export const PROFILES = Object.fromEntries(
   Object.entries(SHAPES).map(([name, s]) => {
     const height = s.outer[s.outer.length - 1][1];
-    const shift = (p) => p.map(([r, y]) => [r, y - height / 2]);
+    const rim = s.inner[0];
+    const bottom = s.inner[s.inner.length - 1][1];
+    const cavity = resample(liquidProfile(s.inner, rim[1] - 0.015), N_LIQUID);
+    const inner = [...s.inner].reverse(); // du fond vers le bord
+    const radiusAt = (y) => {
+      for (let i = 1; i < inner.length; i++) {
+        if (y <= inner[i][1]) {
+          const [r0, y0] = inner[i - 1];
+          const [r1, y1] = inner[i];
+          return r0 + ((r1 - r0) * (y - y0)) / Math.max(1e-6, y1 - y0);
+        }
+      }
+      return rim[0];
+    };
     return [
       name,
       {
-        glass: shift([...resample(s.outer, N_OUTER), ...resample(s.inner, N_INNER)]),
-        liquid: shift(resample(liquidProfile(s.inner, s.fill), N_LIQUID)),
+        glass: [...resample(s.outer, N_OUTER), ...resample(s.inner, N_INNER)],
+        cavity,
         height,
+        fillY: s.fill,
+        bottomY: bottom,
+        rimY: rim[1],
+        rimR: rim[0],
+        footR: s.outer[1][0],
+        radiusAt,
       },
     ];
   }),

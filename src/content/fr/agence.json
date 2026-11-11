@@ -1,0 +1,100 @@
+{
+  "titrePage": "L'agence · {{NOM}}",
+  "descriptionPage": "Notre méthode clé en main, du brief au service, et l'équipe qui la porte.",
+  "titre": "Là où l'univers d'une marque, un cocktail et un service se rencontrent.",
+  "chapeau": "Une belle soirée tient à l'équilibre entre ces trois éléments, et c'est ce que nous construisons pour chaque événement.",
+  "methodeTitre": "Méthode",
+  "etapes": [
+    {
+      "titre": "Le brief",
+      "texte": "Univers de la marque, lieu, public et déroulé de la soirée."
+    },
+    {
+      "titre": "La création",
+      "texte": "Une carte de deux à quatre cocktails, avec ou sans alcool."
+    },
+    {
+      "titre": "La préparation",
+      "texte": "Produits, matériel, verrerie, glace et logistique réunis."
+    },
+    {
+      "titre": "Le service",
+      "texte": "Barmans et serveurs en tenue sobre, sur un bar soigné."
+    }
+  ],
+  "surMesureTitre": "Une carte pour chaque événement.",
+  "surMesurePoints": [
+    {
+      "titre": "Deux à quatre cocktails",
+      "texte": "Peu de références, travaillées avec soin plutôt qu'une longue carte."
+    },
+    {
+      "titre": "L'univers de la marque",
+      "texte": "Couleurs, saison, thème. Un cocktail signature est possible."
+    },
+    {
+      "titre": "Avec ou sans alcool",
+      "texte": "La même exigence pour chaque création."
+    }
+  ],
+  "executionTitre": "Le soin du détail.",
+  "executionPoints": [
+    {
+      "titre": "Le service",
+      "texte": "Une équipe en tenue sobre, des gestes précis, une présence discrète."
+    },
+    {
+      "titre": "L'esthétique",
+      "texte": "Un poste bar soigné, une verrerie et des garnitures choisies pour l'événement."
+    },
+    {
+      "titre": "La fiabilité",
+      "texte": "Installation en amont, logistique maîtrisée, respect des horaires."
+    },
+    {
+      "titre": "La réactivité",
+      "texte": "Les changements de dernière minute font partie du métier : nous nous adaptons."
+    }
+  ],
+  "pourQuiTitre": "Pour qui, pour quoi",
+  "clients": [
+    "Les marques",
+    "Les agences événementielles",
+    "Les traiteurs",
+    "Les lieux événementiels",
+    "Les hôtels et lieux de prestige",
+    "Les particuliers"
+  ],
+  "occasions": [
+    "Défilés de mode",
+    "Lancements de produits",
+    "Soirées privées",
+    "Mariages",
+    "Et autres événements"
+  ],
+  "equipeTitre": "L'équipe",
+  "equipe": [
+    {
+      "prenom": "Léonard",
+      "role": "Cofondateur",
+      "detail": "Opérations, logistique et exécution des événements.",
+      "bio": "[BIOGRAPHIE À COMPLÉTER]",
+      "photo": ""
+    },
+    {
+      "prenom": "Antonin",
+      "role": "Cofondateur",
+      "detail": "Relation clients, partenariats et développement.",
+      "bio": "[BIOGRAPHIE À COMPLÉTER]",
+      "photo": ""
+    },
+    {
+      "prenom": "Axel",
+      "role": "Chef mixologue",
+      "detail": "Compose la carte de cocktails de chaque événement.",
+      "bio": "[BIOGRAPHIE À COMPLÉTER]",
+      "photo": ""
+    }
+  ],
+  "lienContact": "Parlons de votre événement."
+}

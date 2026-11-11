@@ -1,0 +1,29 @@
+{
+  "descriptionParDefaut": "Cocktails sur mesure et service de bar pour les marques, les hôtels et les lieux d'exception à Paris. De la création de la carte au service sur place.",
+  "nav": {
+    "carte": "La carte",
+    "agence": "L'agence",
+    "contact": "Contact"
+  },
+  "son": {
+    "activer": "Activer le son",
+    "couper": "Couper le son"
+  },
+  "coordonnees": {
+    "email": "[E-MAIL À COMPLÉTER]",
+    "telephone": "[TÉLÉPHONE À COMPLÉTER]",
+    "adresse": "[ADRESSE À COMPLÉTER]"
+  },
+  "reseaux": [
+    {
+      "label": "Instagram",
+      "url": "[À COMPLÉTER]"
+    },
+    {
+      "label": "LinkedIn",
+      "url": "[À COMPLÉTER]"
+    }
+  ],
+  "lienLegal": "Mentions légales et confidentialité",
+  "mentionSante": "L'abus d'alcool est dangereux pour la santé. À consommer avec modération."
+}

@@ -1,0 +1,88 @@
+{
+  "titrePage": "La carte · {{NOM}}",
+  "descriptionPage": "Huit créations d'Axel, quatre cocktails et quatre sans alcool, à base d'ingrédients français.",
+  "titre": "La carte",
+  "intro": "Chaque carte est composée pour l'événement. Voici huit créations d'Axel, à base d'ingrédients français.",
+  "aide": "Faites défiler, utilisez les flèches du clavier ou balayez pour changer de création.",
+  "titreCocktails": "Cocktails",
+  "titreSansAlcool": "Sans alcool",
+  "libelleGarniture": "Garniture",
+  "libelleVerre": "Verre",
+  "mentionSante": "L'abus d'alcool est dangereux pour la santé. À consommer avec modération.",
+  "cocktails": [
+    {
+      "nom": "Cachemire",
+      "sousTitre": "Relecture du Sidecar",
+      "description": "Cognac, rooibos, orange sanguine, verjus, eau de fleur d'oranger.",
+      "garniture": "Fleur de tagète orange",
+      "verre": "coupe",
+      "couleurClaire": "#D08A45",
+      "couleurProfonde": "#7A3B1C"
+    },
+    {
+      "nom": "Nuance",
+      "sousTitre": "Relecture de la Margarita",
+      "description": "Armagnac blanche infusée à la figue, Floc de Gascogne à l'orange, citron vert.",
+      "garniture": "Feuille de figuier séchée",
+      "verre": "coupe",
+      "couleurClaire": "#9AA866",
+      "couleurProfonde": "#4F5D2F"
+    },
+    {
+      "nom": "Carmin",
+      "sousTitre": "Relecture du Cosmopolitan",
+      "description": "Vodka au piment d'Espelette, framboise, verjus.",
+      "garniture": "Feuille de shiso rouge",
+      "verre": "martini",
+      "couleurClaire": "#B3263E",
+      "couleurProfonde": "#5E0F22"
+    },
+    {
+      "nom": "Sable du Mesnil",
+      "sousTitre": "Relecture du French 75",
+      "description": "Gin français, immortelle, champagne extra-brut.",
+      "garniture": "Tête d'immortelle séchée",
+      "verre": "flute",
+      "couleurClaire": "#E9D8A6",
+      "couleurProfonde": "#BFA46A"
+    }
+  ],
+  "sansAlcool": [
+    {
+      "nom": "Verger en fleur",
+      "sousTitre": "La poire",
+      "description": "Jus de poire artisanal français, orgeat, verjus, poivre de Timut.",
+      "garniture": "Fleur blanche",
+      "verre": "coupe",
+      "couleurClaire": "#CBD3A0",
+      "couleurProfonde": "#8E9F63"
+    },
+    {
+      "nom": "Ambroisie",
+      "sousTitre": "Le jasmin",
+      "description": "Thé vert au jasmin, miel, verjus, eau de jasmin, fleur de sel.",
+      "garniture": "Fleurs de jasmin",
+      "verre": "tumbler",
+      "couleurClaire": "#E0B84E",
+      "couleurProfonde": "#A67C1E"
+    },
+    {
+      "nom": "Sparkling Negroni",
+      "sousTitre": "Version sans alcool",
+      "description": "Gin sans alcool, pétillant, cuvée blanche sans alcool, zeste d'orange.",
+      "garniture": "Zeste d'orange",
+      "verre": "tumbler",
+      "couleurClaire": "#E07B4A",
+      "couleurProfonde": "#A2441F"
+    },
+    {
+      "nom": "Verlaine",
+      "sousTitre": "Le thym",
+      "description": "Rhum sans alcool, sirop et hydrolat de thym, pointe de sel, eau gazeuse.",
+      "garniture": "Thym frais",
+      "verre": "highball",
+      "couleurClaire": "#8FA38A",
+      "couleurProfonde": "#4C6149"
+    }
+  ]
+}

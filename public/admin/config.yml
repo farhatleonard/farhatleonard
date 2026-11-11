@@ -1,0 +1,223 @@
+# Configuration de l'espace d'administration (https://decapcms.org/docs/)
+backend:
+  name: github
+  repo: farhatleonard/farhatleonard
+  branch: main
+  commit_messages:
+    update: "Contenu : mise à jour de « {{slug}} »"
+    uploadMedia: "Média : ajout de « {{path}} »"
+    deleteMedia: "Média : suppression de « {{path}} »"
+
+locale: fr
+site_url: /
+display_url: /
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+collections:
+  - name: contenu
+    label: Contenu du site
+    editor: { preview: false }
+    files:
+      # ------------------------------------------------------------
+      - name: reglages
+        label: Réglages (nom de l'agence)
+        file: src/content/reglages.json
+        fields:
+          - { name: nom, label: "Nom de l'agence", widget: string, hint: "Repris partout sur le site. Dans les textes, {{NOM}} est remplacé par ce nom." }
+          - { name: url, label: "Adresse du site", widget: string, hint: "Ex. : https://www.monagence.fr (sans / à la fin)" }
+          - { name: langue, label: Langue, widget: hidden, default: fr }
+
+      # ------------------------------------------------------------
+      - name: general
+        label: Commun à toutes les pages
+        file: src/content/fr/general.json
+        fields:
+          - { name: descriptionParDefaut, label: "Description pour Google (par défaut)", widget: text }
+          - name: nav
+            label: Menu
+            widget: object
+            fields:
+              - { name: carte, label: "Lien vers la carte", widget: string }
+              - { name: agence, label: "Lien vers l'agence", widget: string }
+              - { name: contact, label: "Lien vers le contact", widget: string }
+          - name: son
+            label: Bouton son
+            widget: object
+            collapsed: true
+            fields:
+              - { name: activer, label: "Texte « activer »", widget: string }
+              - { name: couper, label: "Texte « couper »", widget: string }
+          - name: coordonnees
+            label: Coordonnées
+            widget: object
+            fields:
+              - { name: email, label: E-mail, widget: string }
+              - { name: telephone, label: Téléphone, widget: string }
+              - { name: adresse, label: Adresse, widget: string }
+          - name: reseaux
+            label: Réseaux sociaux
+            widget: list
+            fields:
+              - { name: label, label: Nom, widget: string }
+              - { name: url, label: "Lien (https://…)", widget: string }
+          - { name: lienLegal, label: "Texte du lien vers les mentions légales", widget: string }
+          - { name: mentionSante, label: "Mention santé (pied de page)", widget: string }
+
+      # ------------------------------------------------------------
+      - name: accueil
+        label: Page Accueil
+        file: src/content/fr/accueil.json
+        fields:
+          - { name: titrePage, label: "Titre de l'onglet et de Google", widget: string }
+          - { name: descriptionPage, label: "Description pour Google", widget: text }
+          - { name: descripteur, label: "Petite ligne au-dessus du titre", widget: string }
+          - { name: phrase, label: "Grand titre", widget: text }
+          - { name: boutonCarte, label: "Lien vers la carte", widget: string }
+          - { name: enCeMoment, label: "Légende du cocktail affiché", widget: string }
+          - { name: visionTitre, label: "Vision : titre", widget: text }
+          - { name: visionTexte, label: "Vision : texte", widget: text }
+          - { name: boutonAgence, label: "Lien vers l'agence", widget: string }
+
+      # ------------------------------------------------------------
+      - name: carte
+        label: Page La carte (cocktails)
+        file: src/content/fr/carte.json
+        fields:
+          - { name: titrePage, label: "Titre de l'onglet et de Google", widget: string }
+          - { name: descriptionPage, label: "Description pour Google", widget: text }
+          - { name: titre, label: Titre, widget: string }
+          - { name: intro, label: Introduction, widget: text }
+          - { name: aide, label: "Aide (comment naviguer)", widget: string }
+          - { name: titreCocktails, label: "Titre du groupe « cocktails »", widget: string }
+          - { name: titreSansAlcool, label: "Titre du groupe « sans alcool »", widget: string }
+          - { name: libelleGarniture, label: "Mot « Garniture »", widget: string }
+          - { name: libelleVerre, label: "Mot « Verre »", widget: string }
+          - { name: mentionSante, label: "Mention santé", widget: string }
+          - name: cocktails
+            label: Cocktails
+            label_singular: cocktail
+            widget: list
+            summary: "{{fields.nom}} · {{fields.sousTitre}}"
+            hint: "Glissez pour changer l'ordre. Chaque création apparaît en 3D sur le plateau."
+            fields:
+              - { name: nom, label: Nom, widget: string }
+              - { name: sousTitre, label: "Sous-titre", widget: string }
+              - { name: description, label: "Ingrédients", widget: text, hint: "Si le texte contient « champagne », « pétillant » ou « gazeuse », des bulles apparaissent dans le verre." }
+              - { name: garniture, label: Garniture, widget: string, hint: "Reconnues en 3D : zeste, feuille, fleur, thym, romarin, agrume." }
+              - name: verre
+                label: Verre
+                widget: select
+                options:
+                  - { label: Coupe, value: coupe }
+                  - { label: "Verre à martini", value: martini }
+                  - { label: Flûte, value: flute }
+                  - { label: "Verre bas", value: tumbler }
+                  - { label: "Verre haut", value: highball }
+              - { name: couleurClaire, label: "Couleur en surface", widget: color }
+              - { name: couleurProfonde, label: "Couleur au fond du verre", widget: color }
+          - name: sansAlcool
+            label: Sans alcool
+            label_singular: création sans alcool
+            widget: list
+            summary: "{{fields.nom}} · {{fields.sousTitre}}"
+            hint: "Glissez pour changer l'ordre. Chaque création apparaît en 3D sur le plateau."
+            fields:
+              - { name: nom, label: Nom, widget: string }
+              - { name: sousTitre, label: "Sous-titre", widget: string }
+              - { name: description, label: "Ingrédients", widget: text, hint: "Si le texte contient « champagne », « pétillant » ou « gazeuse », des bulles apparaissent dans le verre." }
+              - { name: garniture, label: Garniture, widget: string, hint: "Reconnues en 3D : zeste, feuille, fleur, thym, romarin, agrume." }
+              - name: verre
+                label: Verre
+                widget: select
+                options:
+                  - { label: Coupe, value: coupe }
+                  - { label: "Verre à martini", value: martini }
+                  - { label: Flûte, value: flute }
+                  - { label: "Verre bas", value: tumbler }
+                  - { label: "Verre haut", value: highball }
+              - { name: couleurClaire, label: "Couleur en surface", widget: color }
+              - { name: couleurProfonde, label: "Couleur au fond du verre", widget: color }
+
+      # ------------------------------------------------------------
+      - name: agence
+        label: Page L'agence
+        file: src/content/fr/agence.json
+        fields:
+          - { name: titrePage, label: "Titre de l'onglet et de Google", widget: string }
+          - { name: descriptionPage, label: "Description pour Google", widget: text }
+          - { name: titre, label: "Grand titre", widget: text }
+          - { name: chapeau, label: "Texte sous le titre", widget: text }
+          - { name: methodeTitre, label: "Méthode : titre", widget: string }
+          - name: etapes
+            label: "Méthode : étapes"
+            label_singular: étape
+            widget: list
+            summary: "{{fields.titre}}"
+            hint: "Numérotées automatiquement dans l'ordre."
+            fields:
+              - { name: titre, label: Titre, widget: string }
+              - { name: texte, label: Texte, widget: text }
+          - { name: surMesureTitre, label: "Sur-mesure : titre", widget: string }
+          - name: surMesurePoints
+            label: "Sur-mesure : points"
+            label_singular: point
+            widget: list
+            summary: "{{fields.titre}}"
+            fields:
+              - { name: titre, label: Titre, widget: string }
+              - { name: texte, label: Texte, widget: text }
+          - { name: executionTitre, label: "Exécution : titre", widget: string }
+          - name: executionPoints
+            label: "Exécution : points"
+            label_singular: point
+            widget: list
+            summary: "{{fields.titre}}"
+            fields:
+              - { name: titre, label: Titre, widget: string }
+              - { name: texte, label: Texte, widget: text }
+          - { name: pourQuiTitre, label: "Pour qui : titre", widget: string }
+          - { name: clients, label: "Clients", widget: list, field: { name: client, label: Client, widget: string } }
+          - { name: occasions, label: "Occasions", widget: list, field: { name: occasion, label: Occasion, widget: string } }
+          - { name: equipeTitre, label: "Équipe : titre", widget: string }
+          - name: equipe
+            label: "Équipe : membres"
+            label_singular: membre
+            widget: list
+            summary: "{{fields.prenom}} · {{fields.role}}"
+            fields:
+              - { name: prenom, label: Prénom, widget: string }
+              - { name: role, label: Rôle, widget: string }
+              - { name: detail, label: "Ce qu'il fait", widget: string }
+              - { name: bio, label: Biographie, widget: text, required: false }
+              - { name: photo, label: "Photo (portrait, format 4:5)", widget: image, required: false }
+          - { name: lienContact, label: "Lien de fin vers le contact", widget: string }
+
+      # ------------------------------------------------------------
+      - name: contact
+        label: Page Contact
+        file: src/content/fr/contact.json
+        fields:
+          - { name: titrePage, label: "Titre de l'onglet et de Google", widget: string }
+          - { name: descriptionPage, label: "Description pour Google", widget: text }
+          - { name: titre, label: Titre, widget: string }
+          - { name: intro, label: Introduction, widget: text }
+          - { name: coordonneesTitre, label: "Titre des coordonnées", widget: string }
+          - { name: boutonEnvoyer, label: "Bouton d'envoi du formulaire", widget: string }
+
+      # ------------------------------------------------------------
+      - name: legal
+        label: Mentions légales
+        file: src/content/fr/legal.json
+        fields:
+          - { name: titrePage, label: "Titre de l'onglet", widget: string }
+          - { name: descriptionPage, label: "Description", widget: text }
+          - { name: titre, label: Titre, widget: string }
+          - name: blocs
+            label: Rubriques
+            label_singular: rubrique
+            widget: list
+            summary: "{{fields.titre}}"
+            fields:
+              - { name: titre, label: Titre, widget: string }
+              - { name: lignes, label: Paragraphes, widget: list, field: { name: ligne, label: Paragraphe, widget: text } }

@@ -38,11 +38,11 @@
   display: grid; grid-template-columns: repeat(12, 1fr); align-content: center;
   padding: 7rem var(--gutter) var(--space-4);
 }
-.home-hero__text { position: relative; grid-column: 1 / span 7; display: grid; gap: var(--space-3); justify-items: start; }
+.home-hero__text { position: relative; z-index: 1; grid-column: 1 / span 7; display: grid; gap: var(--space-3); justify-items: start; }
 .home-hero__kicker { font-size: var(--fs-xs); font-stretch: var(--stretch-meta); color: var(--fg-2); letter-spacing: 0.01em; }
 .home-hero__title { font-size: clamp(2.6rem, 1.2rem + 4.2vw, 6rem); line-height: 1.02; letter-spacing: -0.015em; max-width: 13em; }
 .home-hero__title > * { padding-bottom: 0.14em; margin-bottom: -0.14em; } /* masques des lignes : ne pas couper les jambages */
-.home-hero__now {
+.home-hero__now { z-index: 1;
   position: absolute; right: var(--gutter); bottom: var(--space-4);
   display: grid; justify-items: end; text-align: right; gap: 0.15rem;
 }
@@ -50,6 +50,11 @@
 .home-hero__now-name { font-family: var(--font-display); font-size: var(--fs-m); line-height: 1.1; }
 .home-hero__now-sub { font-family: var(--font-display); font-style: italic; color: var(--fg-2); }
 .home-hero .stage { --fx: 72%; }
+/* Voile à gauche : la phrase reste lisible devant la 3D */
+.home-hero::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(20, 17, 15, 0.9) 0%, rgba(20, 17, 15, 0.6) 38%, rgba(20, 17, 15, 0) 62%);
+}
 
 @media (max-width: 860px) {
   .home-hero { align-content: end; padding-top: 50svh; }
@@ -57,6 +62,7 @@
   .home-hero__text { grid-column: 1 / -1; }
   .home-hero__now { top: 6.5rem; bottom: auto; right: var(--gutter); }
   .home-hero .stage { --fx: 50%; }
+  .home-hero::before { background: linear-gradient(0deg, rgba(20, 17, 15, 0.95) 0%, rgba(20, 17, 15, 0.7) 40%, rgba(20, 17, 15, 0) 62%); }
 }
 
 .home-intro {
@@ -95,7 +101,14 @@
   display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr auto; column-gap: var(--space-4);
 }
 .carte.is-staged .carte__head { position: relative; grid-column: 1; grid-row: 1; }
+/* Voile sombre en bas de la scène : le texte reste lisible par-dessus la 3D */
+.carte.is-staged .carte__sticky::after {
+  content: ''; position: absolute; inset: auto 0 0 0; height: 42%; pointer-events: none;
+  background: linear-gradient(to top, rgba(20, 17, 15, 0.92) 15%, rgba(20, 17, 15, 0));
+}
+.carte.is-staged .carte__groups, .carte.is-staged .carte__nav, .carte.is-staged .carte__health { z-index: 1; }
 .carte.is-staged .carte__title { font-size: var(--fs-m); }
+.carte.is-staged .carte__intro, .carte.is-staged .carte__help { display: none; } /* le grand nom prend la place */
 .carte.is-staged .carte__intro { font-size: var(--fs-xs); font-stretch: var(--stretch-meta); }
 .carte.is-staged .carte__groups { position: relative; grid-column: 1; grid-row: 3; min-height: 11rem; }
 .carte.is-staged .carte__group { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
@@ -118,8 +131,7 @@
   font-family: var(--font-display); font-size: 1.05rem; line-height: 1.35; color: var(--fg-2);
   transition: color 0.3s ease;
 }
-.carte__dot.is-na { /* sépare cocktails et sans alcool */ }
-.carte__nav li:has(.is-na):not(li:has(.is-na) ~ li) { margin-top: 0.9rem; }
+.carte__nav li:has(.is-first-na) { margin-top: 0.9rem; } /* sépare cocktails et sans alcool */
 .carte__dot:hover { color: var(--fg); }
 .carte__dot[aria-current='true'] { color: var(--fg); font-style: italic; }
 .carte__arrow { display: none; font-family: var(--font-display); font-size: 1.8rem; line-height: 1; width: 2.75rem; height: 2.75rem; border: 1px solid var(--rule); border-radius: 50%; }
@@ -131,7 +143,7 @@
   .carte__nav { grid-column: 1; grid-row: 4; justify-items: stretch; margin-top: var(--space-2); grid-template-columns: auto 1fr auto; align-items: center; }
   .carte__nav ol { display: flex; overflow-x: auto; gap: 1.1rem; scrollbar-width: none; justify-content: start; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); padding-inline: 1rem; }
   .carte__dot { white-space: nowrap; }
-  .carte__nav li:has(.is-na):not(li:has(.is-na) ~ li) { margin-top: 0; }
+  .carte__nav li:has(.is-first-na) { margin-top: 0; }
   .carte__arrow { display: grid; place-items: center; }
   .carte.is-staged .carte__health { grid-row: 5; }
 }
@@ -174,6 +186,8 @@
   background: color-mix(in srgb, var(--fg) 6%, transparent);
   font-family: var(--font-display); font-size: 5rem; font-style: italic; color: color-mix(in srgb, var(--fg) 30%, transparent);
 }
+.member__photo img { width: 100%; height: 100%; object-fit: cover; }
+.member__bio { font-size: var(--fs-s); }
 .member__name { font-size: var(--fs-m); }
 .member__role { color: var(--fg-2); }
 .member__todo { font-size: var(--fs-xs); font-stretch: var(--stretch-meta); }

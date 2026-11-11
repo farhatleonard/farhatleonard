@@ -22,6 +22,8 @@ const readDrinks = () =>
     glass: el.dataset.glass,
     c1: el.dataset.c1,
     c2: el.dataset.c2,
+    garnish: el.dataset.garnish,
+    sparkling: el.dataset.sparkling === 'true',
   }));
 
 if (page === 'accueil') import('./pages/home.js').then((m) => m.init({ readDrinks, reducedMotion }));

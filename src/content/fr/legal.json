@@ -1,0 +1,44 @@
+{
+  "titrePage": "Mentions légales et confidentialité · {{NOM}}",
+  "descriptionPage": "Mentions légales et politique de confidentialité.",
+  "titre": "Mentions légales et confidentialité",
+  "blocs": [
+    {
+      "titre": "Éditeur du site",
+      "lignes": [
+        "Raison sociale : [À COMPLÉTER]",
+        "Forme juridique et capital : [À COMPLÉTER]",
+        "SIREN : [À COMPLÉTER]",
+        "Siège social : [À COMPLÉTER]",
+        "Directeur de la publication : [À COMPLÉTER]",
+        "Contact : [E-MAIL À COMPLÉTER]"
+      ]
+    },
+    {
+      "titre": "Hébergeur",
+      "lignes": [
+        "Netlify, Inc. [ADRESSE DE L'HÉBERGEUR À VÉRIFIER]"
+      ]
+    },
+    {
+      "titre": "Données personnelles",
+      "lignes": [
+        "Les informations envoyées par le formulaire de contact servent uniquement à répondre à votre demande. Elles ne sont ni vendues ni cédées.",
+        "Durée de conservation : [À COMPLÉTER]",
+        "Vous pouvez demander l'accès, la rectification ou la suppression de vos données à l'adresse : [E-MAIL À COMPLÉTER]"
+      ]
+    },
+    {
+      "titre": "Cookies",
+      "lignes": [
+        "Ce site n'utilise pas de cookies de suivi."
+      ]
+    },
+    {
+      "titre": "Alcool",
+      "lignes": [
+        "L'abus d'alcool est dangereux pour la santé. À consommer avec modération. La vente d'alcool aux mineurs est interdite."
+      ]
+    }
+  ]
+}

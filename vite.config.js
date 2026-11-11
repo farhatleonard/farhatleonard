@@ -1,9 +1,21 @@
 import { defineConfig } from 'vite';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const CONTENT = resolve('src/content/site.json');
+const CONTENT_DIR = resolve('src/content');
+
+// Lit tous les fichiers de contenu : réglages + un fichier par page dans src/content/<langue>/
+function loadContent() {
+  const reglages = JSON.parse(readFileSync(resolve(CONTENT_DIR, 'reglages.json'), 'utf8'));
+  const dir = resolve(CONTENT_DIR, reglages.langue || 'fr');
+  const pages = Object.fromEntries(
+    readdirSync(dir)
+      .filter((f) => f.endsWith('.json'))
+      .map((f) => [f.replace('.json', ''), JSON.parse(readFileSync(resolve(dir, f), 'utf8'))]),
+  );
+  return { reglages, pages };
+}
 const RENDER = resolve('src/templates/render.js');
 const PAGES = ['index.html', 'carte/index.html', 'agence/index.html', 'contact/index.html', 'mentions-legales/index.html'];
 
@@ -13,9 +25,8 @@ function contentPlugin() {
     name: 'site-content',
     async transformIndexHtml(html) {
       const page = html.match(/data-page="([^"]+)"/)[1];
-      const content = JSON.parse(readFileSync(CONTENT, 'utf8'));
       const { createRenderer } = await import(pathToFileURL(RENDER).href + '?t=' + Date.now());
-      const r = createRenderer(content).render(page);
+      const r = createRenderer(loadContent()).render(page);
       return html
         .replaceAll('%LANG%', r.lang)
         .replaceAll('%TITLE%', r.title)
@@ -25,7 +36,7 @@ function contentPlugin() {
         .replace('<!--@body-->', r.body);
     },
     handleHotUpdate({ file, server }) {
-      if (file === CONTENT || file === RENDER) server.ws.send({ type: 'full-reload' });
+      if (file.startsWith(CONTENT_DIR) || file === RENDER) server.ws.send({ type: 'full-reload' });
     },
   };
 }
