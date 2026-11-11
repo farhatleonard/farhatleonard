@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Remplacer [À COMPLÉTER] par le domaine définitif
+Sitemap: https://[À COMPLÉTER]/sitemap.xml
