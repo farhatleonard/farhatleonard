@@ -39,6 +39,10 @@ Tout est dans **`src/styles/tokens.css`** (design tokens). Polices : Bodoni Moda
 | `index.html`, `carte/`, `agence/`, `contact/`, `mentions-legales/` | Les pages du site |
 | `public/` | Fichiers copiés tels quels (favicon, robots.txt…) |
 
-## Déploiement
+## Mise en ligne (Netlify)
 
-Instructions Netlify : à venir (étape 6).
+Le site est relié à Netlify : **chaque modification envoyée sur GitHub (branche `main`) met le site en ligne à jour automatiquement**, en 1 à 2 minutes, à la même adresse.
+
+La configuration est dans `netlify.toml` (commande de construction, dossier `dist`, en-têtes).
+
+⚠️ **Avant le lancement officiel** : supprimer la ligne `X-Robots-Tag = "noindex"` dans `netlify.toml`, sinon Google n'indexera pas le site.
