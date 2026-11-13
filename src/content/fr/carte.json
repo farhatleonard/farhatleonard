@@ -15,9 +15,10 @@
       "sousTitre": "Relecture du Sidecar",
       "description": "Cognac, rooibos, orange sanguine, verjus, eau de fleur d'oranger.",
       "garniture": "Fleur de tagète orange",
-      "verre": "coupe",
+      "verre": "tumbler",
       "couleurClaire": "#D08A45",
-      "couleurProfonde": "#7A3B1C"
+      "couleurProfonde": "#7A3B1C",
+      "photo": "/images/cocktails/cachemire.webp"
     },
     {
       "nom": "Nuance",
@@ -26,25 +27,28 @@
       "garniture": "Feuille de figuier séchée",
       "verre": "coupe",
       "couleurClaire": "#9AA866",
-      "couleurProfonde": "#4F5D2F"
+      "couleurProfonde": "#4F5D2F",
+      "photo": "/images/cocktails/nuance.webp"
     },
     {
       "nom": "Carmin",
       "sousTitre": "Relecture du Cosmopolitan",
       "description": "Vodka au piment d'Espelette, framboise, verjus.",
       "garniture": "Feuille de shiso rouge",
-      "verre": "martini",
+      "verre": "tumbler",
       "couleurClaire": "#B3263E",
-      "couleurProfonde": "#5E0F22"
+      "couleurProfonde": "#5E0F22",
+      "photo": "/images/cocktails/carmin.webp"
     },
     {
       "nom": "Sable du Mesnil",
       "sousTitre": "Relecture du French 75",
       "description": "Gin français, immortelle, champagne extra-brut.",
       "garniture": "Tête d'immortelle séchée",
-      "verre": "flute",
+      "verre": "vin",
       "couleurClaire": "#E9D8A6",
-      "couleurProfonde": "#BFA46A"
+      "couleurProfonde": "#BFA46A",
+      "photo": "/images/cocktails/sable-du-mesnil.webp"
     }
   ],
   "sansAlcool": [
@@ -53,18 +57,20 @@
       "sousTitre": "La poire",
       "description": "Jus de poire artisanal français, orgeat, verjus, poivre de Timut.",
       "garniture": "Fleur blanche",
-      "verre": "coupe",
+      "verre": "tumbler",
       "couleurClaire": "#CBD3A0",
-      "couleurProfonde": "#8E9F63"
+      "couleurProfonde": "#8E9F63",
+      "photo": "/images/cocktails/verger-en-fleur.webp"
     },
     {
       "nom": "Ambroisie",
       "sousTitre": "Le jasmin",
       "description": "Thé vert au jasmin, miel, verjus, eau de jasmin, fleur de sel.",
       "garniture": "Fleurs de jasmin",
-      "verre": "tumbler",
+      "verre": "highball",
       "couleurClaire": "#E0B84E",
-      "couleurProfonde": "#A67C1E"
+      "couleurProfonde": "#A67C1E",
+      "photo": "/images/cocktails/ambroisie.webp"
     },
     {
       "nom": "Sparkling Negroni",
@@ -73,16 +79,18 @@
       "garniture": "Zeste d'orange",
       "verre": "tumbler",
       "couleurClaire": "#E07B4A",
-      "couleurProfonde": "#A2441F"
+      "couleurProfonde": "#A2441F",
+      "photo": "/images/cocktails/sparkling-negroni.webp"
     },
     {
       "nom": "Verlaine",
       "sousTitre": "Le thym",
       "description": "Rhum sans alcool, sirop et hydrolat de thym, pointe de sel, eau gazeuse.",
       "garniture": "Thym frais",
-      "verre": "highball",
+      "verre": "tumbler",
       "couleurClaire": "#8FA38A",
-      "couleurProfonde": "#4C6149"
+      "couleurProfonde": "#4C6149",
+      "photo": "/images/cocktails/verlaine.webp"
     }
   ]
 }

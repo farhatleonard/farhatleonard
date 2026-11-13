@@ -8,7 +8,7 @@ const esc = (s = '') =>
 // Les placeholders [À COMPLÉTER], [PHOTO À FOURNIR], [NOM À CHOISIR]… restent visibles à l'écran.
 const TODO = /\[[^\]]*À (COMPLÉTER|FOURNIR|CHOISIR|VÉRIFIER)\]/g;
 
-const GLASS_LABELS = { coupe: 'Coupe', flute: 'Flûte', martini: 'Verre à martini', tumbler: 'Verre bas', highball: 'Verre haut' };
+const GLASS_LABELS = { coupe: 'Coupe', flute: 'Flûte', martini: 'Verre à martini', tumbler: 'Verre bas', highball: 'Verre haut', vin: 'Verre à vin' };
 
 export const PAGES = {
   accueil: '/',
@@ -33,6 +33,12 @@ export function createRenderer({ reglages, pages: c }, { relative = false } = {}
     if (!relative) return PAGES[target];
     const depth = currentPage === 'accueil' ? '' : '../';
     return target === 'accueil' ? `${depth}index.html` : `${depth}${PAGES[target].slice(1)}index.html`;
+  };
+
+  // Fichier du dossier public (photo…) : chemin absolu en production, relatif en aperçu
+  const asset = (path) => {
+    if (!path || !relative || !path.startsWith('/')) return path || '';
+    return (currentPage === 'accueil' ? '' : '../') + path.slice(1);
   };
 
   const wordmark = () => `<span class="wordmark">${txt(nom)}</span>`;
@@ -84,7 +90,7 @@ export function createRenderer({ reglages, pages: c }, { relative = false } = {}
   const sparkling = (d) => /champagne|pétillant|gazeuse|tonic|soda|bulles/i.test(d.description || '');
   // Données lues par la scène 3D
   const drinkData = (d) =>
-    `data-drink data-name="${raw(d.nom)}" data-sub="${raw(d.sousTitre)}" data-glass="${esc(d.verre)}" data-c1="${esc(d.couleurClaire)}" data-c2="${esc(d.couleurProfonde)}" data-garnish="${raw(d.garniture)}" data-sparkling="${sparkling(d)}"`;
+    `data-drink data-name="${raw(d.nom)}" data-sub="${raw(d.sousTitre)}" data-glass="${esc(d.verre)}" data-c1="${esc(d.couleurClaire)}" data-c2="${esc(d.couleurProfonde)}" data-garnish="${raw(d.garniture)}" data-sparkling="${sparkling(d)}" data-photo="${esc(asset(d.photo))}"`;
 
   const drinkItem = (d, i) => `
     <li class="drink" id="creation-${i + 1}" style="--c1:${esc(d.couleurClaire)}" ${drinkData(d)} data-group="${d.group}">

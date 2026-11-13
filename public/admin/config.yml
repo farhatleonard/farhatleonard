@@ -116,8 +116,10 @@ collections:
                   - { label: Flûte, value: flute }
                   - { label: "Verre bas", value: tumbler }
                   - { label: "Verre haut", value: highball }
+                  - { label: "Verre à vin", value: vin }
               - { name: couleurClaire, label: "Couleur en surface", widget: color }
               - { name: couleurProfonde, label: "Couleur au fond du verre", widget: color }
+              - { name: photo, label: "Photo détourée (PNG ou WebP transparent, verre posé, cadré serré)", widget: image, required: false, hint: "Si une photo est fournie, elle remplace le verre en 3D sur la roue. Sans photo, le verre est dessiné en 3D." }
           - name: sansAlcool
             label: Sans alcool
             label_singular: création sans alcool
@@ -138,8 +140,10 @@ collections:
                   - { label: Flûte, value: flute }
                   - { label: "Verre bas", value: tumbler }
                   - { label: "Verre haut", value: highball }
+                  - { label: "Verre à vin", value: vin }
               - { name: couleurClaire, label: "Couleur en surface", widget: color }
               - { name: couleurProfonde, label: "Couleur au fond du verre", widget: color }
+              - { name: photo, label: "Photo détourée (PNG ou WebP transparent, verre posé, cadré serré)", widget: image, required: false, hint: "Si une photo est fournie, elle remplace le verre en 3D sur la roue. Sans photo, le verre est dessiné en 3D." }
 
       # ------------------------------------------------------------
       - name: agence

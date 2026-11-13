@@ -26,6 +26,7 @@ const readDrinks = () =>
     c2: el.dataset.c2,
     garnish: el.dataset.garnish,
     sparkling: el.dataset.sparkling === 'true',
+    photo: el.dataset.photo || '',
   }));
 
 const loader = initLoader({ reducedMotion });

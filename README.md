@@ -111,3 +111,11 @@ Appliqués d'après les skills officiels GSAP (`greensock/gsap-skills`) et les s
 - **Polices préchargées** : pas de changement de police visible au chargement.
 - **En-têtes de sécurité** Netlify : HSTS, protection contre l'intégration dans un autre site, permissions du navigateur restreintes.
 - **Animations** revues selon le skill web-animation-design : survols courts (150 à 300 ms), retour au clic, survols réservés à la souris, zones de clic d'au moins 44 px, textes lisibles même avant leur animation.
+
+## Photos des cocktails sur la roue
+
+Chaque création peut avoir une **photo détourée** (`photo` dans `src/content/fr/carte.json`, ou champ « Photo » dans `/admin`). Elle remplace alors le verre en 3D sur la roue : la photo reste face à la caméra, se reflète sur le plateau laqué, garde une ombre de contact et devient floue à l'arrière-plan. Sans photo, le verre est dessiné en 3D.
+
+Photos actuelles : `public/images/cocktails/*.webp`, détourées depuis une planche sur fond blanc.
+
+**Pour de meilleures photos** (recommandé avant le lancement) : une photo par cocktail, verre entier cadré serré, au moins 1 200 px de haut, idéalement sur **fond noir** ou déjà détourée (PNG ou WebP transparent), toutes prises sous le même angle et le même éclairage.

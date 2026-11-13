@@ -196,8 +196,52 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
   const toV2 = (p) => p.map(([x, y]) => new THREE.Vector2(x, y));
   const geoCache = {};
 
+  // ---------- Photos détourées (si fournies) ----------
+  const texLoader = new THREE.TextureLoader();
+  const photos = await Promise.all(
+    drinks.map((d) =>
+      d.photo
+        ? texLoader.loadAsync(d.photo).then((t) => {
+            t.colorSpace = THREE.SRGBColorSpace;
+            t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            return t;
+          }).catch(() => null)
+        : null,
+    ),
+  );
+  // Version floutée de chaque photo : les verres de l'arrière-plan sont légèrement flous (profondeur de champ)
+  const blurred = (tex) => {
+    const img = tex.image;
+    const c = document.createElement('canvas');
+    c.width = img.width;
+    c.height = img.height;
+    const g = c.getContext('2d');
+    if (!('filter' in g)) return null;
+    g.filter = 'blur(4px)';
+    g.drawImage(img, 0, 0);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  };
+  // Dégradé pour le reflet sur le plateau : visible au pied du verre, effacé vers le bas
+  const fadeCanvas = document.createElement('canvas');
+  fadeCanvas.width = 4;
+  fadeCanvas.height = 128;
+  {
+    const g = fadeCanvas.getContext('2d');
+    const grd = g.createLinearGradient(0, 128, 0, 0);
+    grd.addColorStop(0, '#ffffff');
+    grd.addColorStop(0.35, '#3a3a3a');
+    grd.addColorStop(0.6, '#000000');
+    g.fillStyle = grd;
+    g.fillRect(0, 0, 4, 128);
+  }
+  const fadeTex = new THREE.CanvasTexture(fadeCanvas);
+  const PHOTO_SCALE = 1.5 / 330; // les photos viennent d'une même prise de vue : leurs tailles relatives sont conservées
+
   const step = (Math.PI * 2) / n;
   const items = drinks.map((d, i) => {
+    if (photos[i]) return photoItem(d, i, photos[i]);
     const p = PROFILES[d.glass] || PROFILES.coupe;
     if (!geoCache[d.glass]) {
       geoCache[d.glass] = {
@@ -318,6 +362,49 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     return { d, p, g, glass, plane, liquid, garnish, bubbles, ice, phi };
   });
 
+  function photoItem(d, i, tex) {
+    const { width: w, height: h } = tex.image;
+    const H = h * PHOTO_SCALE;
+    const Wd = w * PHOTO_SCALE;
+    const plane = new THREE.PlaneGeometry(1, 1);
+    plane.translate(0, 0.5, 0); // le pied du verre est posé sur le plateau
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false, fog: true });
+    const photo = new THREE.Mesh(plane, mat);
+    photo.scale.set(Wd, H, 1);
+    photo.renderOrder = 3;
+    const blurTex = blurred(tex);
+    const soft = blurTex
+      ? new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ map: blurTex, transparent: true, depthWrite: false, toneMapped: false, opacity: 0 }))
+      : null;
+    if (soft) {
+      soft.scale.copy(photo.scale);
+      soft.renderOrder = 4;
+    }
+    // Reflet sur le plateau laqué
+    const refl = new THREE.Mesh(
+      plane,
+      new THREE.MeshBasicMaterial({ map: tex, alphaMap: fadeTex, transparent: true, opacity: 0.22, depthWrite: false, depthTest: false, toneMapped: false }),
+    );
+    refl.scale.set(Wd, -H, 1);
+    refl.position.y = 0.002;
+    refl.renderOrder = 1;
+    // Ombre de contact
+    const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
+    shadow.rotation.x = -Math.PI / 2;
+    shadow.position.y = 0.003;
+    shadow.scale.set(Wd * 0.95, Wd * 0.5, 1);
+
+    const tilt = new THREE.Group(); // bascule légère au pied quand le plateau accélère
+    tilt.add(photo);
+    if (soft) tilt.add(soft);
+    const g = new THREE.Group();
+    const phi = i * step;
+    g.position.set(Math.sin(phi) * R, 0.002, Math.cos(phi) * R);
+    g.add(shadow, refl, tilt);
+    ring.add(g);
+    return { d, g, phi, isPhoto: true, photo, soft, refl, tilt, mat };
+  }
+
   // ---------- État ----------
   const state = {
     angle: 0, // position du plateau, en « nombre de créations »
@@ -384,7 +471,8 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
   let composer = null;
   let bloom = null;
   let bokeh = null;
-  if (!isTouch && !reducedMotion) {
+  const allPhotos = items.every((it) => it.isPhoto);
+  if (!isTouch && !reducedMotion && !allPhotos) {
     const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
     composer = new EffectComposer(renderer, rt);
     composer.addPass(new RenderPass(scene, camera));
@@ -419,7 +507,9 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
       cam.updateProjectionMatrix();
     }
     const dist = mode === 'home' ? (portrait ? 8.4 : 7.2) : portrait ? 6.6 : 5.6;
-    state.base.cam.set(0, mode === 'home' ? 2.1 : portrait ? 1.55 : 1.3, R + dist);
+    // Avec des photos (prises légèrement en plongée), la caméra monte pour garder le même point de vue
+    const camY = mode === 'home' ? 2.1 : allPhotos ? (portrait ? 2.25 : 2.0) : portrait ? 1.55 : 1.3;
+    state.base.cam.set(0, camY, R + dist);
     state.base.look.set(0, 0.8, R - 0.3);
     baseCamera.position.copy(state.base.cam);
     baseCamera.lookAt(state.base.look);
@@ -527,13 +617,29 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     if (state.fillStarted && state.fill < 1) state.fill = Math.min(1, state.fill + realDt / 1.8);
     const fillK = easeOut(state.fill);
 
-    for (const it of items) {
+    for (const [idx, it] of items.entries()) {
       const { p, g, plane } = it;
       // tangente au cercle, dans le sens de rotation du plateau
       const psi = it.phi - state.angle * step;
       const facing = Math.cos(psi); // 1 = face à la caméra, -1 = derrière
       g.visible = facing > -0.55; // les verres cachés à l'arrière ne sont pas dessinés
       if (!g.visible) continue;
+      if (it.isPhoto) {
+        // la photo reste face à la caméra pendant que le plateau tourne
+        g.getWorldPosition(tmpP);
+        g.rotation.y = Math.atan2(camera.position.x - tmpP.x, camera.position.z - tmpP.z) - ring.rotation.y;
+        // apparition à l'ouverture, en cascade
+        const k = THREE.MathUtils.clamp(fillK * 1.6 - idx * 0.06, 0, 1);
+        it.tilt.position.y = (1 - k) * -0.25;
+        // net au premier plan, flou derrière
+        const blur = reducedMotion ? 0 : THREE.MathUtils.clamp((0.92 - facing) / 0.5, 0, 1);
+        it.mat.opacity = k * (it.soft ? 1 - blur * 0.85 : 1 - blur * 0.25);
+        if (it.soft) it.soft.material.opacity = k * blur;
+        it.refl.material.opacity = 0.2 * k;
+        // légère bascule quand le plateau accélère ou freine
+        it.tilt.rotation.z = reducedMotion ? 0 : -state.slosh * 0.22;
+        continue;
+      }
       it.glass.material = facing > 0.9 ? glassMat : glassLiteMat; // réfraction réelle : verre au premier plan seulement
       g.getWorldPosition(tmpP);
       tmpT.set(-Math.cos(psi), 0, Math.sin(psi));
