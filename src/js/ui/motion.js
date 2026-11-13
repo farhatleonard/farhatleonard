@@ -47,12 +47,16 @@ export function initMotion({ reducedMotion }) {
     });
   }
 
-  // Pied de page : le grand nom monte en place quand on arrive en bas de page
+  // Sur l'accueil, le pied de page est animé après les séquences (ordre de la page)
+  if (page !== 'accueil') initFooterMotion();
+}
+
+// Pied de page : le grand nom monte en place quand on arrive en bas de page
+export function initFooterMotion() {
   const footerName = document.querySelector('.site-footer__name');
-  if (footerName) {
-    gsap.fromTo(footerName, { yPercent: 40, autoAlpha: 0.2 }, {
-      yPercent: 0, autoAlpha: 1, ease: 'none',
-      scrollTrigger: { trigger: '.site-footer', start: 'top bottom', end: 'top 35%', scrub: 0.8 },
-    });
-  }
+  if (!footerName) return;
+  gsap.fromTo(footerName, { yPercent: 40, autoAlpha: 0.2 }, {
+    yPercent: 0, autoAlpha: 1, ease: 'none',
+    scrollTrigger: { trigger: '.site-footer', start: 'top bottom', end: 'top 35%', scrub: 0.8 },
+  });
 }

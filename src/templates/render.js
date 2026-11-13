@@ -31,7 +31,7 @@ export function createRenderer({ reglages, pages: c }) {
   const header = (page) => `
   <a class="skip-link" href="#contenu">Aller au contenu</a>
   ${['accueil', 'carte'].includes(page) ? `<div class="loader" data-loader aria-hidden="true"><span class="loader__name">${txt(nom)}</span><span class="loader__count" data-loader-count>00</span><span class="loader__line"><i data-loader-line></i></span></div>` : ''}
-  <header class="site-header" data-header>
+  <header class="site-header" data-header data-curtain="${esc(drinks().map((d) => d.couleurProfonde).join(','))}">
     <a class="site-header__brand" href="/" ${page === 'accueil' ? 'aria-current="page"' : ''}>${wordmark()}</a>
     <nav class="site-header__nav" id="menu" aria-label="Navigation principale" data-menu>
       <ul>${['carte', 'agence', 'contact']
@@ -109,10 +109,81 @@ export function createRenderer({ reglages, pages: c }) {
         </p>
         <ul hidden>${drinks().map((d) => `<li ${drinkData(d)}></li>`).join('')}</ul>
       </section>
-      <section class="home-intro" aria-labelledby="vision-titre">
-        <h2 id="vision-titre" class="home-intro__title">${txt(a.visionTitre)}</h2>
-        <p class="home-intro__text">${txt(a.visionTexte)}</p>
-        <a class="link-cta" href="${PAGES.agence}">${txt(a.boutonAgence)}</a>
+
+      <!-- Manifeste : la phrase s'allume mot à mot au défilement -->
+      <section class="manifesto" aria-labelledby="vision-titre">
+        <h2 id="vision-titre" class="manifesto__title" data-words>${String(a.visionTitre)
+          .split(' ')
+          .map((w) => `<span class="w">${txt(w)}</span>`)
+          .join(' ')}</h2>
+        <div class="manifesto__aside">
+          <p>${txt(a.visionTexte)}</p>
+          <a class="link-cta" href="${PAGES.agence}">${txt(a.boutonAgence)}</a>
+        </div>
+      </section>
+
+      <!-- La carte en couleurs : un panneau par création, défilement horizontal -->
+      <section class="spectrum" aria-labelledby="spectrum-titre" data-spectrum>
+        <div class="spectrum__pin">
+          <header class="spectrum__head">
+            <h2 id="spectrum-titre">${txt(c.carte.titre)}</h2>
+            <p>${txt(c.carte.intro)}</p>
+          </header>
+          <ul class="spectrum__track" data-spectrum-track>
+            ${drinks()
+              .map(
+                (d) => `
+            <li class="panel" style="--c1:${esc(d.couleurClaire)};--c2:${esc(d.couleurProfonde)}">
+              <article class="panel__inner">
+                <p class="panel__kind">${txt(d.group === 'cocktails' ? c.carte.titreCocktails : c.carte.titreSansAlcool)}</p>
+                <h3 class="panel__name" data-panel-name>${txt(d.nom)}</h3>
+                <p class="panel__sub">${txt(d.sousTitre)}</p>
+                <p class="panel__desc">${txt(d.description)}</p>
+                <p class="panel__garnish">${txt(c.carte.libelleGarniture)} : ${txt(d.garniture)}</p>
+              </article>
+            </li>`,
+              )
+              .join('')}
+            <li class="panel panel--end">
+              <a class="panel__link" href="${PAGES.carte}">${txt(a.boutonCarte)}</a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- La méthode : des cartes qui s'empilent -->
+      <section class="stack" aria-labelledby="stack-titre">
+        <h2 id="stack-titre" class="stack__title">${txt(c.agence.methodeTitre)}</h2>
+        <ol class="stack__list">
+          ${(c.agence.etapes || [])
+            .map(
+              (e, i) => `
+          <li class="stack__card" style="--i:${i}" data-stack-card>
+            <p class="stack__tab" aria-hidden="true"><span>${String(i + 1).padStart(2, '0')}</span><span>${txt(e.titre)}</span></p>
+            <span class="stack__num" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
+            <h3 class="stack__name"><span class="visually-hidden">${String(i + 1).padStart(2, '0')}. </span>${txt(e.titre)}</h3>
+            <p class="stack__text">${txt(e.texte)}</p>
+          </li>`,
+            )
+            .join('')}
+        </ol>
+      </section>
+
+      <!-- Occasions : bandeau continu, lié à la vitesse de défilement -->
+      <section class="ribbon" aria-label="${raw(c.agence.pourQuiTitre)}">
+        <p class="visually-hidden">${list(c.agence.occasions)}. ${list(c.agence.clients)}.</p>
+        <div class="ribbon__row" aria-hidden="true" data-ribbon="1">
+          ${[0, 1].map(() => `<span class="ribbon__set">${(c.agence.occasions || []).map((o) => `<span>${txt(o)}</span><i></i>`).join('')}</span>`).join('')}
+        </div>
+        <div class="ribbon__row ribbon__row--soft" aria-hidden="true" data-ribbon="-1">
+          ${[0, 1].map(() => `<span class="ribbon__set">${(c.agence.clients || []).map((o) => `<span>${txt(o)}</span><i></i>`).join('')}</span>`).join('')}
+        </div>
+      </section>
+
+      <!-- Appel au contact -->
+      <section class="cta" aria-labelledby="cta-titre">
+        <h2 id="cta-titre" class="cta__title">${txt(c.contact.titre)}</h2>
+        <a class="cta__button" href="${PAGES.contact}"><span>${txt(a.boutonContact || 'Nous écrire')}</span></a>
       </section>
     </main>`;
     },

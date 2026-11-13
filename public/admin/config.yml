@@ -79,6 +79,7 @@ collections:
           - { name: visionTitre, label: "Vision : titre", widget: text }
           - { name: visionTexte, label: "Vision : texte", widget: text }
           - { name: boutonAgence, label: "Lien vers l'agence", widget: string }
+          - { name: boutonContact, label: "Bouton rond vers le contact", widget: string }
 
       # ------------------------------------------------------------
       - name: carte

@@ -6,7 +6,7 @@ gsap.registerPlugin(SplitText);
 
 export function initReveal({ reducedMotion, ready }) {
   if (reducedMotion) return;
-  const els = document.querySelectorAll('.page-head__title, .home-intro__title, .block--end .link-cta');
+  const els = document.querySelectorAll('.page-head__title, .block--end .link-cta, .cta__title, .spectrum__head h2');
   if (!els.length) return;
   document.fonts.ready.then(() => {
     els.forEach((el) => {

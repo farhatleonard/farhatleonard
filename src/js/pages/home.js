@@ -1,6 +1,8 @@
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 
+import { initHomeMotion } from '../ui/home-motion.js';
+
 gsap.registerPlugin(SplitText);
 
 // Accueil : un seul moment orchestré. À la sortie de l'écran de chargement, les verres se remplissent
@@ -11,6 +13,8 @@ export async function init({ readDrinks, reducedMotion, loader, sound }) {
   const nameEl = document.querySelector('[data-now-name]');
   const subEl = document.querySelector('[data-now-sub]');
   const title = document.querySelector('.home-hero__title');
+
+  initHomeMotion({ reducedMotion });
 
   let intro = null;
   if (!reducedMotion) {

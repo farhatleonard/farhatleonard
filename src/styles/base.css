@@ -95,12 +95,6 @@ body::after {
   .has-cursor .cursor.is-link { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
 }
 
-/* Transitions entre pages (navigateurs compatibles) */
-@view-transition { navigation: auto; }
-::view-transition-old(root) { animation: 0.4s var(--ease-in-out) both vt-out; }
-::view-transition-new(root) { animation: 0.6s var(--ease-out) 0.1s both vt-in; }
-@keyframes vt-out { to { opacity: 0; } }
-@keyframes vt-in { from { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }

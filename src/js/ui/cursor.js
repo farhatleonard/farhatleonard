@@ -23,7 +23,7 @@ export function initCursor({ reducedMotion }) {
   });
 
   // Boutons magnétiques : ils glissent légèrement vers la souris, puis reviennent en place
-  document.querySelectorAll('.button, .carte__arrow, .sound-toggle').forEach((el) => {
+  document.querySelectorAll('.button, .carte__arrow, .sound-toggle, .cta__button').forEach((el) => {
     const mx = gsap.quickTo(el, 'x', { duration: 0.6, ease: 'power3' });
     const my = gsap.quickTo(el, 'y', { duration: 0.6, ease: 'power3' });
     el.addEventListener('pointermove', (e) => {

@@ -89,3 +89,12 @@ Appliqués d'après les skills officiels GSAP (`greensock/gsap-skills`) et les s
 - **Éclairage** : studio photo virtuel (boîtes à lumière) pour des reflets nets.
 - **Lueur sur les reflets** (bloom à seuil élevé) : ordinateur uniquement, coupée automatiquement si l'appareil peine ; le fond est compensé pour rester exactement au noir de la page.
 - **Qualité adaptative** : la lueur puis la résolution baissent si l'image n'est pas fluide.
+
+### Accueil : les séquences
+1. **Manifeste** : la phrase de vision s'allume mot à mot au défilement.
+2. **La carte en couleurs** : un panneau par création, dans ses deux couleurs (champ « couleur en surface » et « couleur au fond du verre ») ; section figée et défilement horizontal sur ordinateur, balayage au doigt sur mobile.
+3. **La méthode** : cartes empilées comme des chemises de dossier ; l'onglet de chaque étape reste lisible.
+4. **Bandeau** des occasions et des clients, accéléré par le défilement, sens inversé en remontant.
+5. **Appel au contact** avec bouton rond magnétique.
+
+**Transitions entre pages** : rideau dans la couleur d'une des créations (désactivé si le visiteur demande moins d'animations).

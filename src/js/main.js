@@ -9,6 +9,7 @@ import { initSound } from './ui/sound.js';
 import { initScroll } from './ui/scroll.js';
 import { initReveal } from './ui/reveal.js';
 import { initMotion } from './ui/motion.js';
+import { initCurtain } from './ui/curtain.js';
 
 const page = document.body.dataset.page;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -34,6 +35,7 @@ initCursor({ reducedMotion });
 const sound = initSound();
 initReveal({ reducedMotion, ready: loader.done });
 initMotion({ reducedMotion });
+initCurtain({ reducedMotion });
 
 const ctx = { readDrinks, reducedMotion, loader, sound, lenis };
 if (page === 'accueil') import('./pages/home.js').then((m) => m.init(ctx));
