@@ -26,7 +26,7 @@ function contentPlugin() {
     async transformIndexHtml(html) {
       const page = html.match(/data-page="([^"]+)"/)[1];
       const { createRenderer } = await import(pathToFileURL(RENDER).href + '?t=' + Date.now());
-      const r = createRenderer(loadContent()).render(page);
+      const r = createRenderer(loadContent(), { relative: process.env.APERCU === '1' }).render(page);
       return html
         .replaceAll('%LANG%', r.lang)
         .replaceAll('%TITLE%', r.title)

@@ -18,7 +18,7 @@ export const PAGES = {
   legal: '/mentions-legales/',
 };
 
-export function createRenderer({ reglages, pages: c }) {
+export function createRenderer({ reglages, pages: c }, { relative = false } = {}) {
   const g = c.general;
   const nom = reglages.nom;
   const withName = (s) => String(s ?? '').replaceAll('{{NOM}}', nom);
@@ -26,16 +26,24 @@ export function createRenderer({ reglages, pages: c }) {
   const raw = (s) => esc(withName(s));
   const list = (items = []) => items.map((x, i) => txt(i ? x.charAt(0).toLowerCase() + x.slice(1) : x)).join(', ');
 
+  // Lien vers une page. En production : /carte/. En aperçu (fichiers statiques) : chemins relatifs.
+  let currentPage = 'accueil';
+  const link = (target) => {
+    if (!relative) return PAGES[target];
+    const depth = currentPage === 'accueil' ? '' : '../';
+    return target === 'accueil' ? `${depth}index.html` : `${depth}${PAGES[target].slice(1)}index.html`;
+  };
+
   const wordmark = () => `<span class="wordmark">${txt(nom)}</span>`;
 
   const header = (page) => `
   <a class="skip-link" href="#contenu">Aller au contenu</a>
   ${['accueil', 'carte'].includes(page) ? `<div class="loader" data-loader aria-hidden="true"><span class="loader__name">${txt(nom)}</span><span class="loader__count" data-loader-count>00</span><span class="loader__line"><i data-loader-line></i></span></div>` : ''}
   <header class="site-header" data-header data-curtain="${esc(drinks().map((d) => d.couleurProfonde).join(','))}">
-    <a class="site-header__brand" href="/" ${page === 'accueil' ? 'aria-current="page"' : ''}>${wordmark()}</a>
+    <a class="site-header__brand" href="${link('accueil')}" ${page === 'accueil' ? 'aria-current="page"' : ''}>${wordmark()}</a>
     <nav class="site-header__nav" id="menu" aria-label="Navigation principale" data-menu>
       <ul>${['carte', 'agence', 'contact']
-        .map((k, i) => `<li style="--i:${i}"><a href="${PAGES[k]}" ${k === page ? 'aria-current="page"' : ''}>${txt(g.nav[k])}</a></li>`)
+        .map((k, i) => `<li style="--i:${i}"><a href="${link(k)}" ${k === page ? 'aria-current="page"' : ''}>${txt(g.nav[k])}</a></li>`)
         .join('')}</ul>
       <p class="site-header__menu-meta">${txt(g.coordonnees.email)}</p>
     </nav>
@@ -61,7 +69,7 @@ export function createRenderer({ reglages, pages: c }) {
       </address>
       <ul class="site-footer__links">
         ${(g.reseaux || []).map((r) => `<li>${r.url && !r.url.startsWith('[') ? `<a href="${esc(r.url)}" rel="noopener">${txt(r.label)}</a>` : `${txt(r.label)} ${txt(r.url)}`}</li>`).join('')}
-        <li><a href="${PAGES.legal}">${txt(g.lienLegal)}</a></li>
+        <li><a href="${link('legal')}">${txt(g.lienLegal)}</a></li>
       </ul>
       <p class="site-footer__health">${txt(g.mentionSante)}</p>
     </div>
@@ -100,7 +108,7 @@ export function createRenderer({ reglages, pages: c }) {
         <div class="home-hero__text">
           <p class="home-hero__kicker">${txt(a.descripteur)}</p>
           <h1 id="home-titre" class="home-hero__title">${txt(a.phrase)}</h1>
-          <a class="link-cta" href="${PAGES.carte}">${txt(a.boutonCarte)}</a>
+          <a class="link-cta" href="${link('carte')}">${txt(a.boutonCarte)}</a>
         </div>
         <p class="home-hero__now" aria-live="polite">
           <span class="home-hero__now-label">${txt(a.enCeMoment)}</span>
@@ -118,7 +126,7 @@ export function createRenderer({ reglages, pages: c }) {
           .join(' ')}</h2>
         <div class="manifesto__aside">
           <p>${txt(a.visionTexte)}</p>
-          <a class="link-cta" href="${PAGES.agence}">${txt(a.boutonAgence)}</a>
+          <a class="link-cta" href="${link('agence')}">${txt(a.boutonAgence)}</a>
         </div>
       </section>
 
@@ -145,7 +153,7 @@ export function createRenderer({ reglages, pages: c }) {
               )
               .join('')}
             <li class="panel panel--end">
-              <a class="panel__link" href="${PAGES.carte}">${txt(a.boutonCarte)}</a>
+              <a class="panel__link" href="${link('carte')}">${txt(a.boutonCarte)}</a>
             </li>
           </ul>
         </div>
@@ -183,7 +191,7 @@ export function createRenderer({ reglages, pages: c }) {
       <!-- Appel au contact -->
       <section class="cta" aria-labelledby="cta-titre">
         <h2 id="cta-titre" class="cta__title">${txt(c.contact.titre)}</h2>
-        <a class="cta__button" href="${PAGES.contact}"><span>${txt(a.boutonContact || 'Nous écrire')}</span></a>
+        <a class="cta__button" href="${link('contact')}"><span>${txt(a.boutonContact || 'Nous écrire')}</span></a>
       </section>
     </main>`;
     },
@@ -285,7 +293,7 @@ export function createRenderer({ reglages, pages: c }) {
       </section>
 
       <section class="block block--end">
-        <a class="link-cta" href="${PAGES.contact}">${txt(a.lienContact)}</a>
+        <a class="link-cta" href="${link('contact')}">${txt(a.lienContact)}</a>
       </section>
     </main>`;
     },
@@ -339,7 +347,7 @@ export function createRenderer({ reglages, pages: c }) {
           </div>
           <div class="consent">
             <input type="checkbox" id="f-consent" name="consentement" value="oui" required aria-required="true" aria-describedby="e-consent">
-            <label for="f-consent">${txt(f.consentement)} <a href="${PAGES.legal}">${txt(f.lienConfidentialite)}</a></label>
+            <label for="f-consent">${txt(f.consentement)} <a href="${link('legal')}">${txt(f.lienConfidentialite)}</a></label>
             <p class="field__error" id="e-consent"></p>
           </div>
           <div class="form__submit">
@@ -375,6 +383,7 @@ export function createRenderer({ reglages, pages: c }) {
   };
 
   const render = (page) => {
+    currentPage = page;
     const p = c[page];
     return {
       lang: reglages.langue || 'fr',
