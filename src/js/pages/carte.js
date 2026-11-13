@@ -1,6 +1,8 @@
 // La carte : la page défile normalement (pas de défilement piégé). La scène reste fixe et
 // le plateau tourne en suivant le défilement. Flèches, clavier et liste de noms
 // font défiler la page jusqu'à la création voulue.
+import { gsap } from 'gsap';
+
 export async function init({ readDrinks, reducedMotion, loader, sound, lenis }) {
   const main = document.querySelector('.carte');
   const container = document.querySelector('[data-stage="carte"]');
@@ -41,6 +43,12 @@ export async function init({ readDrinks, reducedMotion, loader, sound, lenis }) 
     if (current !== -1) sound.play('tink');
     current = i;
     drinks.forEach((d, k) => d.el.classList.toggle('is-active', k === i));
+    // Le texte de la création arrive ligne par ligne
+    if (!reducedMotion) {
+      gsap.fromTo(drinks[i].el.querySelectorAll('.drink__sub, .drink__desc, .drink__meta'),
+        { y: 16, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.9, ease: 'expo.out', stagger: 0.07, delay: 0.15, overwrite: true });
+    }
     dots.forEach((b, k) => b.setAttribute('aria-current', k === i ? 'true' : 'false'));
     live.textContent = `${drinks[i].name}, ${drinks[i].sub}`;
   };

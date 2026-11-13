@@ -3,6 +3,11 @@
 // sous l'effet du mouvement, les boissons pétillantes ont des bulles, chaque verre porte sa garniture.
 // Derrière, le nom de la création, que le verre au premier plan déforme par réfraction.
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { PROFILES } from './glasses.js';
 import { createGarnish } from './garnish.js';
 
@@ -34,8 +39,8 @@ function studioEnvironment(renderer) {
     m.rotation.set(rotX, rotY, 0);
     studio.add(m);
   };
-  box(1.1, 7, '#ffffff', 5.5, [-4.2, 1, 2.5], Math.PI / 2.6); // boîte verticale gauche
-  box(0.8, 7, '#ffffff', 3.2, [4.4, 1, 1.8], -Math.PI / 2.4); // boîte verticale droite
+  box(0.7, 7, '#ffffff', 4.6, [-4.2, 1, 2.5], Math.PI / 2.6); // boîte verticale gauche
+  box(0.45, 7, '#ffffff', 3, [4.4, 1, 1.8], -Math.PI / 2.4); // boîte verticale droite
   box(6, 3, '#fff6ea', 1.3, [0, 6, 0], 0, Math.PI / 2); // lumière douce au-dessus
   box(5, 1.2, '#ffcf96', 2.4, [0, 1.6, -6]); // liseré chaud à l'arrière
   box(9, 0.3, '#ffffff', 0.6, [0, -0.5, 5]); // reflet bas, très discret
@@ -43,6 +48,26 @@ function studioEnvironment(renderer) {
   const tex = pmrem.fromScene(studio, 0.015).texture;
   pmrem.dispose();
   return tex;
+}
+
+// Quand la lueur est active, l'image passe par la courbe ACES de Three.js, qui assombrit les noirs.
+// On calcule ici la couleur de fond à dessiner pour retrouver exactement le noir de la page (#14110f).
+const aces = (rgb, exposure) => {
+  const m1 = [[0.59719, 0.35458, 0.04823], [0.076, 0.90834, 0.01566], [0.0284, 0.13383, 0.83777]];
+  const m2 = [[1.60475, -0.53108, -0.07367], [-0.10208, 1.10813, -0.00605], [-0.00327, -0.07276, 1.07602]];
+  const mul = (m, v) => m.map((r) => r[0] * v[0] + r[1] * v[1] + r[2] * v[2]);
+  const fit = (v) => (v * (v + 0.0245786) - 0.000090537) / (v * (0.983729 * v + 0.432951) + 0.238081);
+  return mul(m2, mul(m1, rgb.map((c) => (c * exposure) / 0.6)).map(fit)).map((c) => Math.min(1, Math.max(0, c)));
+};
+function compensatedHex(hex, exposure) {
+  const target = new THREE.Color(hex); // linéaire
+  const goal = [target.r, target.g, target.b];
+  let x = [...goal];
+  for (let i = 0; i < 60; i++) {
+    const y = aces(x, exposure);
+    x = x.map((v, k) => Math.max(0, v + (goal[k] - y[k]) * 0.8));
+  }
+  return '#' + new THREE.Color(x[0], x[1], x[2]).getHexString();
 }
 
 // Ombre douce sous chaque verre
@@ -124,7 +149,10 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     roughness: 0,
     transmission: 1,
     thickness: 0.35,
-    ior: 1.45,
+    ior: 1.5,
+    dispersion: 0.35, // franges colorées du cristal sur les arêtes
+    attenuationColor: '#efe4cf', // très légère teinte dans l'épaisseur du verre
+    attenuationDistance: 3.5,
     specularIntensity: 1,
     envMapIntensity: 1.9,
   });
@@ -139,6 +167,7 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
   });
   const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false, opacity: 0.7 });
   const bubbleGeo = new THREE.SphereGeometry(0.011, 6, 5);
+  const iceGeo = new RoundedBoxGeometry(1, 1, 1, 3, 0.16);
   const toV2 = (p) => p.map(([x, y]) => new THREE.Vector2(x, y));
   const geoCache = {};
 
@@ -190,6 +219,34 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     const garnish = createGarnish(d.garnish, p);
     if (garnish) g.add(garnish);
 
+    // Glaçons dans les verres bas et hauts : teintés par la boisson, ils flottent au niveau du liquide
+    let ice = null;
+    if (d.glass === 'tumbler' || d.glass === 'highball') {
+      ice = new THREE.Group();
+      const iceMat = new THREE.MeshPhysicalMaterial({
+        color: top.clone().lerp(new THREE.Color('#ffffff'), 0.3), // la glace prend la couleur de la boisson
+        roughness: 0.03,
+        clearcoat: 1,
+        clearcoatRoughness: 0.02,
+        envMapIntensity: 2.4,
+        emissive: top.clone().multiplyScalar(0.12),
+      });
+      const r = p.radiusAt(p.fillY);
+      const size = d.glass === 'tumbler' ? r * 0.56 : r * 0.72;
+      const spots = d.glass === 'tumbler'
+        ? [[-0.38, 0, 0.12], [0.34, -0.12, -0.2], [0.02, -0.55, 0.3]]
+        : [[0.05, 0, 0.04], [-0.06, -1.05, -0.03], [0.04, -2.1, 0.05]];
+      spots.forEach(([x, dy, z], k) => {
+        const m = new THREE.Mesh(iceGeo, iceMat);
+        m.scale.setScalar(size * (0.92 + k * 0.05));
+        m.position.set(x * r, dy * size, z * r);
+        m.rotation.set(0.3 + k * 0.7, k * 1.1, 0.2 - k * 0.4);
+        ice.add(m);
+      });
+      ice.userData.offset = -size * 0.42; // le glaçon du dessus affleure à peine la surface
+      g.add(ice);
+    }
+
     // Bulles, collées à la paroi, qui montent
     let bubbles = null;
     if (d.sparkling) {
@@ -208,7 +265,7 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
       g.add(bubbles);
     }
     ring.add(g);
-    return { d, p, g, glass, plane, liquid, garnish, bubbles, phi };
+    return { d, p, g, glass, plane, liquid, garnish, bubbles, ice, phi };
   });
 
   // ---------- État ----------
@@ -260,7 +317,7 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
   function drawBackdrop() {
     const W = bgCanvas.width;
     const H = bgCanvas.height;
-    bg.fillStyle = '#14110f';
+    bg.fillStyle = composer ? inkForComposer : '#14110f';
     bg.fillRect(0, 0, W, H);
     // position à l'écran du verre au premier plan
     frontPoint.set(0, 1.05, R).project(baseCamera); // le nom flotte au niveau du haut des verres
@@ -272,12 +329,31 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     bgTexture.needsUpdate = true;
   }
 
+  // ---------- Lueur sur les reflets les plus forts (ordinateur seulement) ----------
+  // Seuil élevé : seuls les reflets du studio et le filet d'or rayonnent, comme sur une photo de produit.
+  let composer = null;
+  let bloom = null;
+  if (!isTouch && !reducedMotion) {
+    const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
+    composer = new EffectComposer(renderer, rt);
+    composer.addPass(new RenderPass(scene, camera));
+    bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.42, 0.55, 0.92);
+    composer.addPass(bloom);
+    composer.addPass(new OutputPass()); // tonalité et conversion des couleurs, une seule fois, à la fin
+  }
+  const inkForComposer = compensatedHex('#14110f', renderer.toneMappingExposure);
+
   // ---------- Cadrage selon l'écran ----------
   const baseCamera = new THREE.PerspectiveCamera(30, 1, 0.1, 60);
   function resize() {
     const w = container.clientWidth;
     const h = container.clientHeight;
     renderer.setSize(w, h, false);
+    if (composer) {
+      composer.setPixelRatio(renderer.getPixelRatio());
+      composer.setSize(w, h);
+      bloom.resolution.set(w / 2, h / 2);
+    }
     const portrait = w / h < 0.9;
     for (const cam of [camera, baseCamera]) {
       cam.aspect = w / h;
@@ -340,6 +416,11 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     perf.frames = perf.time = 0;
     perf.checks++;
     const pr = renderer.getPixelRatio();
+    if (avg > 1 / 40 && composer) {
+      composer = null; // d'abord, on renonce à la lueur
+      drawBackdrop();
+      return;
+    }
     if (avg > 1 / 40 && pr > 0.75) {
       renderer.setPixelRatio(Math.max(0.75, pr * 0.75));
       resize();
@@ -407,6 +488,11 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
       tmpP.y += level;
       plane.setFromNormalAndCoplanarPoint(tmpN.negate(), tmpP);
 
+      if (it.ice) {
+        it.ice.visible = fillK > 0.85;
+        it.ice.position.y = level + it.ice.userData.offset;
+        it.ice.rotation.z = -(state.slosh + wobble) * 0.6; // les glaçons suivent le mouvement du liquide
+      }
       if (it.garnish?.userData.floats) {
         it.garnish.visible = fillK > 0.9;
         it.garnish.position.y = level + 0.004;
@@ -436,7 +522,8 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     camera.position.copy(state.base.cam).add(tmpP.set(pt.sx * 0.45, -pt.sy * 0.22, 0));
     camera.lookAt(state.base.look);
 
-    renderer.render(scene, camera);
+    if (composer) composer.render(realDt);
+    else renderer.render(scene, camera);
     if (onFirstFrame) {
       const cb = onFirstFrame;
       onFirstFrame = null;

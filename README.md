@@ -76,3 +76,16 @@ La configuration est dans `netlify.toml` (commande de construction, dossier `dis
 **Formulaire de contact** : il utilise Netlify Forms. Une fois le site en ligne, activez la détection des formulaires (*Project configuration → Forms → Enable form detection*), puis redéployez. Les demandes apparaissent dans l'onglet *Forms* de Netlify ; ajoutez-y une notification par e-mail vers votre adresse.
 
 ⚠️ **Avant le lancement officiel** : supprimer la ligne `X-Robots-Tag = "noindex"` dans `netlify.toml`, sinon Google n'indexera pas le site.
+
+## Animations et 3D : choix techniques
+
+Appliqués d'après les skills officiels GSAP (`greensock/gsap-skills`) et les skills Three.js
+`CloudAI-X/threejs-skills` et `scottstts/Threejs-Awesome-Graphics-Agent-Skills` :
+
+- **Défilement** : Lenis piloté par l'horloge de GSAP et synchronisé avec ScrollTrigger (ordinateur uniquement).
+- **Effets au défilement** : transformations et opacité uniquement, « scrub » léger, désactivés si le visiteur demande moins d'animations.
+- **Curseur et boutons magnétiques** : `gsap.quickTo`.
+- **Verre** : réfraction réelle avec dispersion (franges colorées du cristal) sur le verre au premier plan ; verres éloignés simplifiés.
+- **Éclairage** : studio photo virtuel (boîtes à lumière) pour des reflets nets.
+- **Lueur sur les reflets** (bloom à seuil élevé) : ordinateur uniquement, coupée automatiquement si l'appareil peine ; le fond est compensé pour rester exactement au noir de la page.
+- **Qualité adaptative** : la lueur puis la résolution baissent si l'image n'est pas fluide.

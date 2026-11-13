@@ -43,7 +43,11 @@ export function initLoader({ reducedMotion }) {
     gsap
       .timeline({ delay: wait, onComplete: () => { el.remove(); } })
       .to(state, { shown: 100, duration: 0.5, ease: 'power2.out', onUpdate: render })
-      .add(() => { el.classList.add('is-done'); resolveDone(); }, '+=0.05')
+      .add(() => {
+        el.classList.add('is-done');
+        resolveDone();
+        setTimeout(() => el.remove(), 2500); // sécurité : retiré même si l'animation est ralentie
+      }, '+=0.05')
       .to(el, { clipPath: 'inset(0 0 100% 0)', duration: reducedMotion ? 0.01 : 1, ease: 'expo.inOut' });
   };
   // Sécurité : jamais plus de 6 secondes d'attente
