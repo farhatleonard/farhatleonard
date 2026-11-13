@@ -8,6 +8,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { PROFILES } from './glasses.js';
 import { createGarnish } from './garnish.js';
 
@@ -68,6 +69,24 @@ function compensatedHex(hex, exposure) {
     x = x.map((v, k) => Math.max(0, v + (goal[k] - y[k]) * 0.8));
   }
   return '#' + new THREE.Color(x[0], x[1], x[2]).getHexString();
+}
+
+// Ombrage « en volume » : selon l'angle de vue, le centre d'un objet (vu de face) et ses bords
+// (vus en rasant) ne reçoivent pas la même lumière. C'est ce qui donne de l'épaisseur au liquide
+// et de la transparence à la glace, sans passer par une vraie réfraction (trop coûteuse ici).
+function volumeShading(material, { centerGlow, edgeGlow, centerTint, edgeTint, edgeWhite = 0 }) {
+  material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <emissivemap_fragment>',
+      `#include <emissivemap_fragment>
+      float fres = pow(1.0 - clamp(abs(dot(normalize(-vViewPosition), normal)), 0.0, 1.0), 1.6);
+      diffuseColor.rgb *= mix(${centerTint.toFixed(2)}, ${edgeTint.toFixed(2)}, fres);
+      diffuseColor.rgb = mix(diffuseColor.rgb, vec3(1.0), fres * ${edgeWhite.toFixed(2)});
+      totalEmissiveRadiance *= mix(${centerGlow.toFixed(2)}, ${edgeGlow.toFixed(2)}, fres);`,
+    );
+  };
+  material.customProgramCacheKey = () => `volume-${centerGlow}-${edgeGlow}-${centerTint}-${edgeTint}-${edgeWhite}`;
+  return material;
 }
 
 // Ombre douce sous chaque verre
@@ -168,6 +187,12 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
   const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false, opacity: 0.7 });
   const bubbleGeo = new THREE.SphereGeometry(0.011, 6, 5);
   const iceGeo = new RoundedBoxGeometry(1, 1, 1, 3, 0.16);
+  const dropGeo = new THREE.SphereGeometry(0.0058, 6, 4);
+  // Gouttelettes : de minuscules points de lumière, presque transparents
+  const dropMat = new THREE.MeshStandardMaterial({
+    color: '#fbf6ec', roughness: 0, metalness: 0, envMapIntensity: 2.4,
+    emissive: '#3b342b', transparent: true, opacity: 0.32, depthWrite: false,
+  });
   const toV2 = (p) => p.map(([x, y]) => new THREE.Vector2(x, y));
   const geoCache = {};
 
@@ -208,6 +233,8 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
       side: THREE.DoubleSide, // la face intérieure, vue à travers la coupe, forme la surface du liquide
       clippingPlanes: [plane],
     });
+    // Le centre du liquide s'illumine (lumière qui le traverse), les bords s'assombrissent (épaisseur)
+    volumeShading(liquidMat, { centerGlow: 2.4, edgeGlow: 0.25, centerTint: 1.12, edgeTint: 0.55 });
     const liquid = new THREE.Mesh(cavity, liquidMat);
     const glass = new THREE.Mesh(geoCache[d.glass].glass, glassMat);
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
@@ -224,13 +251,14 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     if (d.glass === 'tumbler' || d.glass === 'highball') {
       ice = new THREE.Group();
       const iceMat = new THREE.MeshPhysicalMaterial({
-        color: top.clone().lerp(new THREE.Color('#ffffff'), 0.3), // la glace prend la couleur de la boisson
+        color: top.clone().lerp(new THREE.Color('#ffffff'), 0.14), // la glace prend la couleur de la boisson
         roughness: 0.03,
         clearcoat: 1,
         clearcoatRoughness: 0.02,
         envMapIntensity: 2.4,
         emissive: top.clone().multiplyScalar(0.12),
       });
+      volumeShading(iceMat, { centerGlow: 1.8, edgeGlow: 0.5, centerTint: 0.8, edgeTint: 1.0, edgeWhite: 0.45 });
       const r = p.radiusAt(p.fillY);
       const size = d.glass === 'tumbler' ? r * 0.56 : r * 0.72;
       const spots = d.glass === 'tumbler'
@@ -243,8 +271,30 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
         m.rotation.set(0.3 + k * 0.7, k * 1.1, 0.2 - k * 0.4);
         ice.add(m);
       });
-      ice.userData.offset = -size * 0.42; // le glaçon du dessus affleure à peine la surface
+      ice.userData.offset = -size * 0.46; // le glaçon du dessus affleure à peine la surface
       g.add(ice);
+    }
+
+    // Buée : fines gouttelettes de condensation sur la paroi extérieure, là où le verre est froid (sous le liquide)
+    {
+      const count = d.glass === 'tumbler' || d.glass === 'highball' ? 140 : 80;
+      const drops = new THREE.InstancedMesh(dropGeo, dropMat, count);
+      const m4 = new THREE.Matrix4();
+      const q = new THREE.Quaternion();
+      const e = new THREE.Euler();
+      for (let k = 0; k < count; k++) {
+        // plus dense en bas, plus clairsemé vers le niveau du liquide
+        const t = Math.pow(Math.random(), 1.6);
+        const y = THREE.MathUtils.lerp(p.bottomY + 0.02, p.fillY - 0.02, 1 - t * 0.98);
+        const a = Math.random() * Math.PI * 2;
+        const r = p.radiusAt(y) + 0.027;
+        const sc = 0.45 + Math.pow(Math.random(), 2) * 1.2; // surtout des petites, quelques plus grosses
+        e.set(0, -a, 0);
+        q.setFromEuler(e);
+        m4.compose(new THREE.Vector3(Math.cos(a) * r, y, Math.sin(a) * r), q, new THREE.Vector3(sc * 0.5, sc, sc));
+        drops.setMatrixAt(k, m4);
+      }
+      g.add(drops);
     }
 
     // Bulles, collées à la paroi, qui montent
@@ -333,10 +383,14 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
   // Seuil élevé : seuls les reflets du studio et le filet d'or rayonnent, comme sur une photo de produit.
   let composer = null;
   let bloom = null;
+  let bokeh = null;
   if (!isTouch && !reducedMotion) {
     const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
     composer = new EffectComposer(renderer, rt);
     composer.addPass(new RenderPass(scene, camera));
+    // Profondeur de champ : net sur le verre au premier plan, léger flou sur ceux de l'arrière-plan
+    bokeh = new BokehPass(scene, camera, { focus: 6, aperture: 0.0016, maxblur: 0.0055 });
+    composer.addPass(bokeh);
     bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.42, 0.55, 0.92);
     composer.addPass(bloom);
     composer.addPass(new OutputPass()); // tonalité et conversion des couleurs, une seule fois, à la fin
@@ -370,6 +424,7 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     baseCamera.position.copy(state.base.cam);
     baseCamera.lookAt(state.base.look);
     baseCamera.updateMatrixWorld();
+    if (bokeh) bokeh.uniforms.focus.value = state.base.cam.distanceTo(new THREE.Vector3(0, 0.7, R));
 
     // Le fond couvre exactement le champ de la caméra, loin derrière le plateau
     const D = dist + R + 4.5;

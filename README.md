@@ -87,6 +87,9 @@ Appliqués d'après les skills officiels GSAP (`greensock/gsap-skills`) et les s
 - **Curseur et boutons magnétiques** : `gsap.quickTo`.
 - **Verre** : réfraction réelle avec dispersion (franges colorées du cristal) sur le verre au premier plan ; verres éloignés simplifiés.
 - **Éclairage** : studio photo virtuel (boîtes à lumière) pour des reflets nets.
+- **Liquide en volume** : plus lumineux au centre (lumière qui le traverse), plus sombre sur les bords (épaisseur).
+- **Glace** teintée par la boisson, arêtes claires ; **buée** de condensation sur les verres.
+- **Profondeur de champ** (ordinateur) : net sur le verre au premier plan, léger flou derrière.
 - **Lueur sur les reflets** (bloom à seuil élevé) : ordinateur uniquement, coupée automatiquement si l'appareil peine ; le fond est compensé pour rester exactement au noir de la page.
 - **Qualité adaptative** : la lueur puis la résolution baissent si l'image n'est pas fluide.
 
