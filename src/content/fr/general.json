@@ -26,5 +26,12 @@
     }
   ],
   "lienLegal": "Mentions légales et confidentialité",
-  "mentionSante": "L'abus d'alcool est dangereux pour la santé. À consommer avec modération."
+  "mentionSante": "L'abus d'alcool est dangereux pour la santé. À consommer avec modération.",
+  "introuvable": {
+    "titrePage": "Page introuvable · {{NOM}}",
+    "titre": "Cette page n'existe pas.",
+    "texte": "L'adresse a peut-être changé. La carte et l'agence sont toujours là.",
+    "lienAccueil": "Revenir à l'accueil",
+    "lienCarte": "Voir la carte"
+  }
 }

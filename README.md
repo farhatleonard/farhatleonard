@@ -101,3 +101,13 @@ Appliqués d'après les skills officiels GSAP (`greensock/gsap-skills`) et les s
 5. **Appel au contact** avec bouton rond magnétique.
 
 **Transitions entre pages** : rideau dans la couleur d'une des créations (désactivé si le visiteur demande moins d'animations).
+
+## Finitions professionnelles
+
+- **Lighthouse** (Google) : 100/100 en accessibilité, bonnes pratiques et référencement sur l'accueil, la carte, l'agence et le contact.
+- **Image de partage** (`public/og-image.jpg`, 1200 × 630) et icône d'écran d'accueil iPhone (`public/apple-touch-icon.png`).
+- **Adresse du site** (`src/content/reglages.json` ou `/admin` → Réglages) : dès qu'elle est renseignée, `sitemap.xml`, l'adresse de référence de chaque page (canonical) et l'image de partage s'activent automatiquement. `robots.txt` est généré à chaque construction.
+- **Page 404** soignée (`404.html`), servie automatiquement par Netlify.
+- **Polices préchargées** : pas de changement de police visible au chargement.
+- **En-têtes de sécurité** Netlify : HSTS, protection contre l'intégration dans un autre site, permissions du navigateur restreintes.
+- **Animations** revues selon le skill web-animation-design : survols courts (150 à 300 ms), retour au clic, survols réservés à la souris, zones de clic d'au moins 44 px, textes lisibles même avant leur animation.

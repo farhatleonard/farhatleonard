@@ -16,6 +16,7 @@ export const PAGES = {
   agence: '/agence/',
   contact: '/contact/',
   legal: '/mentions-legales/',
+  introuvable: '/404.html',
 };
 
 export function createRenderer({ reglages, pages: c }, { relative = false } = {}) {
@@ -370,6 +371,16 @@ export function createRenderer({ reglages, pages: c }, { relative = false } = {}
     </main>`;
     },
 
+    introuvable: () => {
+      const k = g.introuvable;
+      return `
+    <main id="contenu" class="notfound">
+      <h1 class="notfound__title">${txt(k.titre)}</h1>
+      <p class="notfound__text">${txt(k.texte)}</p>
+      <p class="notfound__links"><a class="link-cta" href="${link('accueil')}">${txt(k.lienAccueil)}</a><a class="link-cta" href="${link('carte')}">${txt(k.lienCarte)}</a></p>
+    </main>`;
+    },
+
     legal: () => {
       const k = c.legal;
       return `
@@ -384,13 +395,14 @@ export function createRenderer({ reglages, pages: c }, { relative = false } = {}
 
   const render = (page) => {
     currentPage = page;
-    const p = c[page];
+    const p = page === 'introuvable' ? { titrePage: g.introuvable.titrePage } : c[page];
     return {
       lang: reglages.langue || 'fr',
       title: raw(p.titrePage),
       description: raw(p.descriptionPage || g.descriptionParDefaut),
       nom: raw(nom),
       url: esc(reglages.url) + PAGES[page],
+      root: esc(reglages.url),
       body: header(page) + pages[page]() + footer(),
     };
   };

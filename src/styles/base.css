@@ -64,10 +64,10 @@ body::after {
 }
 .link-cta::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: currentColor; transform-origin: right; transition: transform 0.6s var(--ease-out);
+  background: currentColor; transform-origin: right; transition: transform 0.3s var(--ease-out);
 }
 @media (hover: hover) {
-  .link-cta:hover::after { animation: redraw 0.9s var(--ease-out); }
+  .link-cta:hover::after { animation: redraw 0.55s var(--ease-out); }
 }
 @keyframes redraw {
   0% { transform: scaleX(1); transform-origin: right; } 45% { transform: scaleX(0); transform-origin: right; }
@@ -90,9 +90,9 @@ body::after {
     display: block; position: fixed; left: 0; top: 0; z-index: 180; pointer-events: none; will-change: transform;
     width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%;
     background: #f3ede2; mix-blend-mode: difference;
-    transition: width 0.35s var(--ease-out), height 0.35s var(--ease-out), margin 0.35s var(--ease-out);
+    scale: 1; transition: scale 0.25s var(--ease-out); /* « scale » : pas de recalcul de mise en page */
   }
-  .has-cursor .cursor.is-link { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+  .has-cursor .cursor.is-link { scale: 5.5; }
 }
 
 

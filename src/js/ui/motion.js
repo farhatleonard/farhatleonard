@@ -55,8 +55,8 @@ export function initMotion({ reducedMotion }) {
 export function initFooterMotion() {
   const footerName = document.querySelector('.site-footer__name');
   if (!footerName) return;
-  gsap.fromTo(footerName, { yPercent: 40, autoAlpha: 0.2 }, {
-    yPercent: 0, autoAlpha: 1, ease: 'none',
+  gsap.fromTo(footerName, { yPercent: 40 }, { // mouvement seul : le nom reste lisible à tout moment
+    yPercent: 0, ease: 'none',
     scrollTrigger: { trigger: '.site-footer', start: 'top bottom', end: 'top 35%', scrub: 0.8 },
   });
 }

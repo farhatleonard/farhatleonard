@@ -13,7 +13,7 @@ export function initHomeMotion({ reducedMotion }) {
   // 1. Manifeste : les mots s'allument un à un au défilement
   const words = document.querySelectorAll('.manifesto__title .w');
   if (words.length) {
-    gsap.fromTo(words, { opacity: 0.14 }, {
+    gsap.fromTo(words, { opacity: 0.38 }, { // départ encore lisible (contraste suffisant pour un grand texte)
       opacity: 1, ease: 'none', stagger: 0.1,
       scrollTrigger: { trigger: '.manifesto__title', start: 'top 80%', end: 'bottom 45%', scrub: 0.5 },
     });

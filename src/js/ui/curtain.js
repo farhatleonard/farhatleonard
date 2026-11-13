@@ -21,7 +21,7 @@ export function initCurtain({ reducedMotion }) {
   if (incoming) {
     el.style.setProperty('--curtain', incoming);
     gsap.set(el, { yPercent: 0 });
-    gsap.to(el, { yPercent: -100, duration: 1, ease: 'expo.inOut', delay: 0.1 });
+    gsap.to(el, { yPercent: -100, duration: 0.7, ease: 'expo.inOut', delay: 0.05 }); // entrée de page
   } else {
     gsap.set(el, { yPercent: 100 });
   }
@@ -40,7 +40,7 @@ export function initCurtain({ reducedMotion }) {
       sessionStorage.setItem(KEY, color);
     } catch {}
     el.style.setProperty('--curtain', color);
-    gsap.fromTo(el, { yPercent: 100 }, { yPercent: 0, duration: 0.75, ease: 'expo.inOut', onComplete: () => location.assign(url.href) });
+    gsap.fromTo(el, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: 'expo.inOut', onComplete: () => location.assign(url.href) }); // sortie ~30 % plus rapide que l'entrée
   });
 
   // Retour arrière depuis le cache du navigateur : le rideau ne doit pas rester affiché

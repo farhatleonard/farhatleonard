@@ -73,7 +73,7 @@
   --dur: 0.7s;
 }
 
-body[data-page='accueil'], body[data-page='carte'], body[data-page='contact'] {
+body[data-page='accueil'], body[data-page='carte'], body[data-page='contact'], body[data-page='introuvable'] {
   --bg: var(--ink); --fg: var(--ivory); --fg-2: var(--stone); --rule: var(--rule-dark);
 }
 body[data-page='agence'], body[data-page='legal'] {
