@@ -11,6 +11,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { PROFILES } from './glasses.js';
 import { createGarnish } from './garnish.js';
+import { createPhotoMaterial, curvedPlane, liquidSurface } from './photo-material.js';
 
 const INK = new THREE.Color('#14110f');
 const IVORY = '#f3ede2';
@@ -209,6 +210,13 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
         : null,
     ),
   );
+  // Masque du liquide de chaque photo (même nom, suffixe « -liquide ») : facultatif
+  const liquids = await Promise.all(
+    drinks.map((d, i) =>
+      photos[i] ? texLoader.loadAsync(d.photo.replace(/(\.\w+)$/, '-liquide$1')).catch(() => null) : null,
+    ),
+  );
+  const bentPlane = curvedPlane(1.5);
   // Version floutée de chaque photo : les verres de l'arrière-plan sont légèrement flous (profondeur de champ)
   const blurred = (tex) => {
     const img = tex.image;
@@ -241,7 +249,7 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
 
   const step = (Math.PI * 2) / n;
   const items = drinks.map((d, i) => {
-    if (photos[i]) return photoItem(d, i, photos[i]);
+    if (photos[i]) return photoItem(d, i, photos[i], liquids[i]);
     const p = PROFILES[d.glass] || PROFILES.coupe;
     if (!geoCache[d.glass]) {
       geoCache[d.glass] = {
@@ -362,27 +370,30 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     return { d, p, g, glass, plane, liquid, garnish, bubbles, ice, phi };
   });
 
-  function photoItem(d, i, tex) {
+  function photoItem(d, i, tex, liquidTex) {
     const { width: w, height: h } = tex.image;
     const H = h * PHOTO_SCALE;
     const Wd = w * PHOTO_SCALE;
-    const plane = new THREE.PlaneGeometry(1, 1);
-    plane.translate(0, 0.5, 0); // le pied du verre est posé sur le plateau
-    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false, fog: true });
-    const photo = new THREE.Mesh(plane, mat);
-    photo.scale.set(Wd, H, 1);
+    const mat = createPhotoMaterial(tex, liquidTex, {
+      surfaceY: liquidTex ? liquidSurface(liquidTex.image) : 0.7,
+      sparkling: d.sparkling,
+    });
+    const photo = new THREE.Mesh(bentPlane, mat);
+    photo.scale.set(Wd, H, Wd); // la profondeur de la courbure suit la largeur du verre
     photo.renderOrder = 3;
     const blurTex = blurred(tex);
     const soft = blurTex
-      ? new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ map: blurTex, transparent: true, depthWrite: false, toneMapped: false, opacity: 0 }))
+      ? new THREE.Mesh(bentPlane, new THREE.MeshBasicMaterial({ map: blurTex, transparent: true, depthWrite: false, toneMapped: false, opacity: 0 }))
       : null;
     if (soft) {
       soft.scale.copy(photo.scale);
       soft.renderOrder = 4;
     }
     // Reflet sur le plateau laqué
+    const flat = new THREE.PlaneGeometry(1, 1);
+    flat.translate(0, 0.5, 0);
     const refl = new THREE.Mesh(
-      plane,
+      flat,
       new THREE.MeshBasicMaterial({ map: tex, alphaMap: fadeTex, transparent: true, opacity: 0.22, depthWrite: false, depthTest: false, toneMapped: false }),
     );
     refl.scale.set(Wd, -H, 1);
@@ -397,12 +408,14 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     const tilt = new THREE.Group(); // bascule légère au pied quand le plateau accélère
     tilt.add(photo);
     if (soft) tilt.add(soft);
+    const turn = new THREE.Group(); // pivot du verre (retard sur la rotation du plateau)
+    turn.add(tilt, refl);
     const g = new THREE.Group();
     const phi = i * step;
     g.position.set(Math.sin(phi) * R, 0.002, Math.cos(phi) * R);
-    g.add(shadow, refl, tilt);
+    g.add(shadow, turn);
     ring.add(g);
-    return { d, g, phi, isPhoto: true, photo, soft, refl, tilt, mat };
+    return { d, g, phi, isPhoto: true, photo, soft, refl, tilt, turn, mat };
   }
 
   // ---------- État ----------
@@ -613,6 +626,7 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
       drawBackdrop();
     }
 
+    const pt = state.pointer;
     // Remplissage à l'ouverture
     if (state.fillStarted && state.fill < 1) state.fill = Math.min(1, state.fill + realDt / 1.8);
     const fillK = easeOut(state.fill);
@@ -625,17 +639,30 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
       g.visible = facing > -0.55; // les verres cachés à l'arrière ne sont pas dessinés
       if (!g.visible) continue;
       if (it.isPhoto) {
-        // la photo reste face à la caméra pendant que le plateau tourne
+        // la photo fait face à la caméra… avec un temps de retard quand le plateau glisse :
+        // le verre pivote un peu, sa paroi bombée et le reflet révèlent son volume
         g.getWorldPosition(tmpP);
         g.rotation.y = Math.atan2(camera.position.x - tmpP.x, camera.position.z - tmpP.z) - ring.rotation.y;
+        const lag = reducedMotion ? 0 : THREE.MathUtils.clamp(-state.vel * step * 0.55, -0.55, 0.55);
+        it.turn.rotation.y = lag;
         // apparition à l'ouverture, en cascade
         const k = THREE.MathUtils.clamp(fillK * 1.6 - idx * 0.06, 0, 1);
         it.tilt.position.y = (1 - k) * -0.25;
-        // net au premier plan, flou derrière
+        // net au premier plan, flou et plus sombre derrière
         const blur = reducedMotion ? 0 : THREE.MathUtils.clamp((0.92 - facing) / 0.5, 0, 1);
-        it.mat.opacity = k * (it.soft ? 1 - blur * 0.85 : 1 - blur * 0.25);
-        if (it.soft) it.soft.material.opacity = k * blur;
+        const u = it.mat.uniforms;
+        u.opacity.value = k * (it.soft ? 1 - blur * 0.85 : 1 - blur * 0.25);
+        u.dim.value = 1 - THREE.MathUtils.clamp((0.6 - facing) / 1.4, 0, 0.45);
+        if (it.soft) {
+          it.soft.material.opacity = k * blur;
+          it.soft.material.color.setScalar(u.dim.value);
+        }
         it.refl.material.opacity = 0.2 * k;
+        // le liquide : surface qui penche, vagues, frémissement
+        u.time.value = elapsed;
+        u.tilt.value = reducedMotion ? 0 : THREE.MathUtils.clamp(state.slosh * 2.2, -0.45, 0.45);
+        u.energy.value = reducedMotion ? 0 : Math.min(1, 0.18 + Math.abs(state.sloshVel) * 0.9 + Math.abs(state.vel) * 0.35);
+        u.sheen.value = THREE.MathUtils.clamp(-lag * 1.8 + pt.sx * 0.25, -1, 1);
         // légère bascule quand le plateau accélère ou freine
         it.tilt.rotation.z = reducedMotion ? 0 : -state.slosh * 0.22;
         continue;
@@ -677,7 +704,6 @@ export async function createStage(container, { drinks, mode = 'carte', reducedMo
     }
 
     // Caméra : léger glissement avec le pointeur
-    const pt = state.pointer;
     pt.sx += (pt.x - pt.sx) * 0.05;
     pt.sy += (pt.y - pt.sy) * 0.05;
     camera.position.copy(state.base.cam).add(tmpP.set(pt.sx * 0.45, -pt.sy * 0.22, 0));

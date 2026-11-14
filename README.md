@@ -118,4 +118,6 @@ Chaque création peut avoir une **photo détourée** (`photo` dans `src/content/
 
 Photos actuelles : `public/images/cocktails/*.webp`, détourées depuis une planche sur fond blanc.
 
+**Les photos sont animées** (`src/js/three/photo-material.js`) : surface bombée comme la paroi d'un verre, pivot avec un temps de retard quand la roue glisse, reflet de studio qui balaie le verre, liquide qui penche, ondule et frémit, bulles dans les boissons pétillantes. Le liquide est repéré par un masque : `nom-liquide.webp` à côté de chaque photo (blanc = liquide). Sans masque, la photo pivote et brille mais le liquide ne bouge pas.
+
 **Pour de meilleures photos** (recommandé avant le lancement) : une photo par cocktail, verre entier cadré serré, au moins 1 200 px de haut, idéalement sur **fond noir** ou déjà détourée (PNG ou WebP transparent), toutes prises sous le même angle et le même éclairage.
